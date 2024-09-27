@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from qiskit import QuantumCircuit, qasm3
 from qiskit.quantum_info import Clifford, PauliList
@@ -16,6 +16,9 @@ from .pyqmap import (
     SynthesisResults,
     Tableau,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 def _import_circuit(circuit: str | QuantumCircuit | QuantumComputation) -> QuantumComputation:
@@ -37,18 +40,10 @@ def _import_tableau(tableau: str | Clifford | PauliList | Tableau, include_desta
     """Import a tableau from a string, a Clifford, a PauliList, or a Tableau."""
     if isinstance(tableau, Clifford):
         mode = "B" if include_destabilizers else "S"
-        try:
-            return Tableau(str(_reverse_paulis(tableau.to_labels(mode=mode))))
-        except AttributeError:
-            if include_destabilizers:
-                return Tableau(
-                    str(_reverse_paulis(tableau.stabilizer.to_labels())),
-                    str(_reverse_paulis(tableau.destabilizer.to_labels())),
-                )
-            return Tableau(str(_reverse_paulis(tableau.stabilizer.to_labels())))
-    elif isinstance(tableau, PauliList):
+        return Tableau(str(_reverse_paulis(tableau.to_labels(mode=mode))))
+    if isinstance(tableau, PauliList):
         return Tableau(str(_reverse_paulis(tableau.to_labels())))
-    elif isinstance(tableau, str):
+    if isinstance(tableau, str):
         return Tableau(tableau)
     return tableau
 
@@ -96,6 +91,7 @@ def synthesize_clifford(
     target_tableau: str | Clifford | PauliList | Tableau,
     initial_tableau: str | Clifford | PauliList | Tableau | None = None,
     include_destabilizers: bool = False,
+    coupling_map: Iterable[tuple[int, int]] | None = None,
     **kwargs: Any,  # noqa: ANN401
 ) -> tuple[QuantumCircuit, SynthesisResults]:
     """Synthesize a Clifford circuit from a given tableau starting from an (optional) initial tableau.
@@ -114,6 +110,8 @@ def synthesize_clifford(
             If no initial tableau is given, the synthesis starts from the identity tableau.
         include_destabilizers:
             Flag to set whether destabilizers should be considered in the synthesis
+        coupling_map:
+             Iterable of tuples of connected qubits of the architecture to synthesize for.
         **kwargs:
             Additional keyword arguments to configure the synthesis.
             See :class:`SynthesisConfiguration` for a list of available options.
@@ -125,7 +123,12 @@ def synthesize_clifford(
 
     tableau = _import_tableau(target_tableau, include_destabilizers)
     if initial_tableau is not None:
-        synthesizer = CliffordSynthesizer(_import_tableau(initial_tableau), tableau)
+        if coupling_map is not None:
+            synthesizer = CliffordSynthesizer(_import_tableau(initial_tableau), tableau, set(coupling_map))
+        else:
+            synthesizer = CliffordSynthesizer(_import_tableau(initial_tableau), tableau)
+    elif coupling_map is not None:
+        synthesizer = CliffordSynthesizer(tableau, set(coupling_map))
     else:
         synthesizer = CliffordSynthesizer(tableau)
 
@@ -141,6 +144,7 @@ def optimize_clifford(
     circuit: str | QuantumCircuit | QuantumComputation,
     initial_tableau: str | Clifford | PauliList | Tableau | None = None,
     include_destabilizers: bool = False,
+    coupling_map: Iterable[tuple[int, int]] | None = None,
     **kwargs: Any,  # noqa: ANN401
 ) -> tuple[QuantumCircuit, SynthesisResults]:
     """Optimize a Clifford circuit starting from an (optional) initial tableau.
@@ -159,6 +163,8 @@ def optimize_clifford(
             If no initial tableau is given, the synthesis starts from the identity tableau.
         include_destabilizers:
             Flag to set whether destabilizers should be considered in the synthesis
+        coupling_map:
+            Iterable of tuples of connected qubits of the architecture to synthesize for.
         **kwargs:
             Additional keyword arguments to configure the synthesis.
             See :class:`SynthesisConfiguration` for a list of available options.
@@ -170,7 +176,14 @@ def optimize_clifford(
 
     qc = _import_circuit(circuit)
     if initial_tableau is not None:
-        synthesizer = CliffordSynthesizer(_import_tableau(initial_tableau, include_destabilizers), qc)
+        if coupling_map is not None:
+            synthesizer = CliffordSynthesizer(
+                _import_tableau(initial_tableau, include_destabilizers), qc, set(coupling_map)
+            )
+        else:
+            synthesizer = CliffordSynthesizer(_import_tableau(initial_tableau, include_destabilizers), qc)
+    elif coupling_map is not None:
+        synthesizer = CliffordSynthesizer(qc, set(coupling_map), include_destabilizers)
     else:
         synthesizer = CliffordSynthesizer(qc, include_destabilizers)
 

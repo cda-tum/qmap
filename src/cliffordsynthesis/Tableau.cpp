@@ -525,4 +525,104 @@ bool Tableau::isIdentityTableau() const {
   }
   return true;
 }
+
+Tableau Tableau::applyMapping(const std::vector<std::vector<bool>>& p) {
+  Tableau mappedTableau = Tableau(nQubits, hasDestabilizers());
+  for (size_t i = 0; i < p.size(); i++) {
+    for (size_t j = 0; j < p[i].size(); j++) {
+      // apply mapping from column i to j if p is set
+      if (p[i][j]) {
+        // in every row swap x entry and z entry
+        for (size_t n = 0; n < mappedTableau.getTableauSize(); n++) {
+          mappedTableau.tableau[n][j] = tableau[n][i];
+          mappedTableau.tableau[n][j + mappedTableau.nQubits] =
+              tableau[n][i + mappedTableau.nQubits];
+        }
+      }
+    }
+  }
+  // copy r column without changes
+  for (size_t i = 0; i < tableau.size(); i++) {
+    mappedTableau.tableau[i][2 * nQubits] = tableau[i][2 * nQubits];
+  }
+  return mappedTableau;
+}
+
+// number of Qubits is passed because nQubits is not set in result Tableau of
+// synthesis
+Tableau Tableau::reverseMappingOnRows(const std::vector<std::vector<bool>>& p,
+                                      const size_t nq) {
+  auto mappedTableau = Tableau(nq, true);
+  mappedTableau.tableau = tableau;
+  for (size_t i = 0; i < p.size(); i++) {
+    for (size_t j = 0; j < p[i].size(); j++) {
+      // apply mapping from row i to j if p is set
+      if (p[i][j]) {
+        mappedTableau.tableau[i] = tableau[j];
+        mappedTableau.tableau[i + nq] = tableau[j + nq];
+      }
+    }
+  }
+  return mappedTableau;
+}
+
+// in place Gauss Elimination
+void Tableau::rref() {
+  const size_t rows = tableau.size();
+  const size_t cols = tableau[0].size();
+  if (rows == 1) {
+    return;
+  }
+
+  size_t pivot = 0;
+
+  for (size_t col = 0; col < cols; ++col) {
+    // find the pivot row for the current column
+    size_t maxRow = pivot;
+    if (maxRow >= rows) {
+      break;
+    }
+    for (size_t row = pivot; row < rows; ++row) {
+      if (tableau[row][col] == 1) {
+        maxRow = row;
+        break;
+      }
+    }
+    // if no pivot is found, continue to the next column
+    if (tableau[maxRow][col] == 0) {
+      continue;
+    }
+    // swap the pivot row with the current row
+    std::swap(tableau[pivot], tableau[maxRow]);
+
+    // eliminate all other 1s in the current column
+    for (size_t row = 0; row < rows; ++row) {
+      if (row != pivot && tableau[row][col] == 1) {
+        for (size_t k = 0; k < cols; ++k) {
+          if (tableau[row][k] == tableau[pivot][k]) {
+            tableau[row][k] = 0;
+          } else {
+            tableau[row][k] = 1;
+          }
+        }
+      }
+    }
+    pivot++;
+  }
+}
+// equivalence check for two Tableaus without destablilizers
+bool Tableau::equivalentUpToStabilizer(const Tableau* t) const {
+  if (getTableauSize() != t->getTableauSize()) {
+    return false;
+  }
+
+  Tableau tEliminated = Tableau(nQubits, hasDestabilizers());
+  tEliminated.tableau = tableau;
+  tEliminated.rref();
+
+  Tableau t2Eliminated = Tableau(nQubits, hasDestabilizers());
+  t2Eliminated.tableau = t->getTableau();
+  t2Eliminated.rref();
+  return tEliminated == t2Eliminated;
+}
 } // namespace cs

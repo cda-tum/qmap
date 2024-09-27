@@ -33,6 +33,8 @@ public:
     logicbase::LogicMatrix z;
     // variables for the phase parts of the tableaus
     logicbase::LogicVector r;
+    // variables for mapping of qubits
+    logicbase::LogicMatrix p;
 
     // update rules for single-qubit gates
     [[nodiscard]] logicbase::LogicTerm
@@ -58,13 +60,19 @@ public:
   void createTableauVariables();
 
   // fixing the tableau
-  void assertTableau(const Tableau& tableau, std::size_t t);
+  void assertTableau(const Tableau& tableau, std::size_t t) const;
 
   // extracting the tableau
   void extractTableauFromModel(Results& results, std::size_t t,
                                logicbase::Model& model) const;
 
   [[nodiscard]] auto* getVariables() { return &vars; }
+
+  // get mapping variables and store them in results
+  void extractMappingFromModel(Results& results, logicbase::Model& model) const;
+
+  // assert constraints for mapping variables
+  void assertMappingConstraints() const;
 
 protected:
   // number of qubits N

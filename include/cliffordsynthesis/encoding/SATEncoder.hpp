@@ -14,6 +14,7 @@
 #include "cliffordsynthesis/encoding/TableauEncoder.hpp"
 #include "logicblocks/Logic.hpp"
 #include "logicblocks/LogicBlock.hpp"
+#include "sc/utils.hpp"
 
 #include <cstddef>
 #include <memory>
@@ -32,6 +33,9 @@ public:
 
     // the number of qubits to encode
     std::size_t nQubits{};
+
+    // coupling Map of Qubits
+    CouplingMap couplingMap;
 
     // the number of timesteps to encode
     std::size_t timestepLimit{};

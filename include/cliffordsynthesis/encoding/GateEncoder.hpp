@@ -12,6 +12,7 @@
 #include "logicblocks/Logic.hpp"
 #include "logicblocks/LogicBlock.hpp"
 #include "logicblocks/LogicTerm.hpp"
+#include "sc/utils.hpp"
 
 #include <array>
 #include <cstddef>
@@ -27,8 +28,9 @@ public:
   GateEncoder(const std::size_t nQubits, const std::size_t tableauSize,
               const std::size_t timestepLimit,
               TableauEncoder::Variables* tableauVars,
-              std::shared_ptr<logicbase::LogicBlock> logicBlock)
-      : N(nQubits), S(tableauSize), T(timestepLimit), tvars(tableauVars),
+              std::shared_ptr<logicbase::LogicBlock> logicBlock, CouplingMap cm)
+      : N(nQubits), S(tableauSize), T(timestepLimit),
+        couplingMap(std::move(cm)), tvars(tableauVars),
         lb(std::move(logicBlock)) {}
   virtual ~GateEncoder() = default;
 
@@ -114,6 +116,9 @@ protected:
   std::size_t S{}; // NOLINT (readability-identifier-naming)
   // timestep limit T
   std::size_t T{}; // NOLINT (readability-identifier-naming)
+
+  // coupling Map
+  CouplingMap couplingMap;
 
   // the gate variables
   Variables vars{};

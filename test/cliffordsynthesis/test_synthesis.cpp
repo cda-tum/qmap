@@ -6,10 +6,14 @@
 #include "Definitions.hpp"
 #include "cliffordsynthesis/CliffordSynthesizer.hpp"
 #include "cliffordsynthesis/Results.hpp"
+#include "cliffordsynthesis/Tableau.hpp"
 #include "cliffordsynthesis/TargetMetric.hpp"
 #include "ir/QuantumComputation.hpp"
 #include "ir/operations/Control.hpp"
+#include "sc/utils.hpp"
 
+#include <algorithm>
+#include <cassert>
 #include <cstddef>
 #include <fstream>
 #include <gtest/gtest.h>
@@ -30,6 +34,7 @@ struct TestConfiguration {
   std::string initialTableau;
   std::string targetTableau;
   std::string initialCircuit;
+  std::string couplingMap;
 
   // expected output
   std::size_t expectedMinimalGates{};
@@ -50,6 +55,9 @@ inline void from_json(const nlohmann::json& j, TestConfiguration& test) {
   }
   if (j.contains("initial_circuit")) {
     test.initialCircuit = j.at("initial_circuit").get<std::string>();
+  }
+  if (j.contains("coupling_map")) {
+    test.couplingMap = j.at("coupling_map").get<std::string>();
   }
 
   test.expectedMinimalGates = j.at("expected_minimal_gates").get<std::size_t>();
@@ -72,6 +80,31 @@ std::vector<TestConfiguration> getTests(const std::string& path) {
 }
 } // namespace
 
+CouplingMap parseEdges(const std::string& edgeString) {
+  CouplingMap edges;
+  std::stringstream ss(edgeString);
+  std::string item;
+
+  while (getline(ss, item, ';')) {
+    item.erase(remove(item.begin(), item.end(), '{'), item.end());
+    item.erase(remove(item.begin(), item.end(), '}'), item.end());
+    const size_t pos = item.find(',');
+    std::string first;
+    std::string second;
+
+    first = item.substr(0, pos);
+    second = item.substr(pos + 1);
+
+    const int u = stoi(first);
+    const int v = stoi(second);
+
+    // Insert the edge into the set
+    edges.insert(Edge{u, v});
+    std::cout << "Edge " << u << "," << v << " inserted to cm\n";
+  }
+
+  return edges;
+}
 class SynthesisTest : public ::testing::TestWithParam<TestConfiguration> {
 protected:
   void SetUp() override {
@@ -88,8 +121,14 @@ protected:
       if (test.initialTableau.empty()) {
         initialTableau = Tableau(qc.getNqubits());
         initialTableauWithDestabilizer = Tableau(qc.getNqubits(), true);
-        synthesizer = CliffordSynthesizer(qc);
-        synthesizerWithDestabilizer = CliffordSynthesizer(qc, true);
+        if (test.couplingMap.empty()) {
+          synthesizer = CliffordSynthesizer(qc);
+          synthesizerWithDestabilizer = CliffordSynthesizer(qc, true);
+        } else {
+          synthesizer = CliffordSynthesizer(qc, parseEdges(test.couplingMap));
+          synthesizerWithDestabilizer =
+              CliffordSynthesizer(qc, parseEdges(test.couplingMap), true);
+        }
       } else {
         initialTableau = Tableau(test.initialTableau);
         std::cout << "Initial tableau:\n" << initialTableau;
@@ -117,9 +156,34 @@ protected:
   void TearDown() override {
     std::cout << "Results:\n" << results << "\n";
 
-    resultTableau = synthesizer.getResultTableau();
-    std::cout << "Resulting tableau:\n" << resultTableau;
-    EXPECT_EQ(resultTableau, targetTableau);
+    std::cout << "Mapping of Qubits:\n" << results.getMapping() << "\n";
+
+    resultTableau = Tableau(synthesizer.getResultTableau());
+
+    std::cout << "Result tableau:\n" << resultTableau;
+
+    std::cout << "Target tableau:\n" << targetTableau;
+
+    const std::vector<std::vector<bool>> p = results.getMappingVector();
+    Tableau targetPrime = targetTableau.applyMapping(p);
+    std::cout << "Target tableau with mapping:\n" << targetPrime;
+    if (!targetPrime.hasDestabilizers()) {
+      targetPrime.rref();
+      resultTableau.rref();
+      assert(targetPrime.equivalentUpToStabilizer(&resultTableau));
+      std::cout << "Target tableau with mapping and Gauss:\n" << targetPrime;
+      std::cout << "Result tableau with mapping and Gauss:\n" << resultTableau;
+    } else {
+      targetPrime =
+          targetPrime.reverseMappingOnRows(p, targetPrime.getQubitCount());
+      resultTableau =
+          resultTableau.reverseMappingOnRows(p, targetPrime.getQubitCount());
+      std::cout << "Result tableau with destab mapping reversed:\n"
+                << resultTableau;
+      std::cout << "Target tableau with destab mapping reversed:\n"
+                << targetPrime;
+    }
+    EXPECT_EQ(resultTableau, targetPrime);
 
     const auto& resultCircuit = synthesizer.getResultCircuit();
     std::cout << "Resulting Circuit:\n" << resultCircuit;
@@ -130,6 +194,11 @@ protected:
     auto circuitTableau = initialTableau;
     for (const auto& gate : qc) {
       circuitTableau.applyGate(gate.get());
+    }
+    std::cout << "Circuit Tableau :\n" << circuitTableau;
+    if (!circuitTableau.hasDestabilizers()) {
+      circuitTableau.rref();
+      std::cout << "Circuit Tableau with Gauss" << circuitTableau;
     }
     EXPECT_EQ(resultTableau, circuitTableau);
   }

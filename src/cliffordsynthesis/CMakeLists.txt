@@ -10,11 +10,12 @@ if(NOT TARGET ${MQT_QMAP_CLIFFORD_SYNTHESIS_TARGET_NAME})
   file(GLOB_RECURSE CLIFFORD_SYNTHESIS_HEADERS
        ${MQT_QMAP_INCLUDE_BUILD_DIR}/cliffordsynthesis/*.hpp)
   file(GLOB_RECURSE CLIFFORD_SYNTHESIS_SOURCES **.cpp)
+  list(APPEND CLIFFORD_SYNTHESIS_SOURCES "${CMAKE_SOURCE_DIR}/src/sc/utils.cpp")
 
   # add CliffordSynthesis Package library
   add_library(${MQT_QMAP_CLIFFORD_SYNTHESIS_TARGET_NAME} ${CLIFFORD_SYNTHESIS_HEADERS}
                                                          ${CLIFFORD_SYNTHESIS_SOURCES})
-
+  message(${CLIFFORD_SYNTHESIS_SOURCES})
   # set include directories
   target_include_directories(${MQT_QMAP_CLIFFORD_SYNTHESIS_TARGET_NAME}
                              PUBLIC $<BUILD_INTERFACE:${MQT_QMAP_INCLUDE_BUILD_DIR}>)

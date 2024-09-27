@@ -6,6 +6,7 @@
 #include "cliffordsynthesis/CliffordSynthesizer.hpp"
 
 #include "cliffordsynthesis/Configuration.hpp"
+#include "cliffordsynthesis/Results.hpp"
 #include "cliffordsynthesis/Tableau.hpp"
 #include "cliffordsynthesis/TargetMetric.hpp"
 #include "cliffordsynthesis/encoding/SATEncoder.hpp"
@@ -52,6 +53,7 @@ void CliffordSynthesizer::synthesize(const Configuration& config) {
   encoderConfig.initialTableau = &initialTableau;
   encoderConfig.targetTableau = &targetTableau;
   encoderConfig.nQubits = initialTableau.getQubitCount();
+  encoderConfig.couplingMap = couplingMap;
   encoderConfig.timestepLimit = configuration.initialTimestepLimit;
   encoderConfig.targetMetric = configuration.target;
   encoderConfig.useMaxSAT = configuration.useMaxSAT;
@@ -85,6 +87,7 @@ void CliffordSynthesizer::synthesize(const Configuration& config) {
     const auto [lowerBin, upperBin] = determineUpperBound(encoderConfig);
     lower = lowerBin;
     upper = upperBin;
+    PLOG_INFO << "Upper bound " << upperBin;
 
     // if the upper bound is 0, the solution does not require any gates and the
     // synthesis is done.
@@ -95,7 +98,10 @@ void CliffordSynthesizer::synthesize(const Configuration& config) {
   }
   // Otherwise, the determined upper bound is used as an initial timestep
   // limit.
+
   encoderConfig.timestepLimit = upper;
+  PLOG_INFO << "Upper bound " << encoderConfig.timestepLimit;
+
   // Once a valid upper bound is found, the SAT problem is solved again with
   // the objective function encoded.
   switch (config.target) {
@@ -491,6 +497,7 @@ std::vector<std::size_t> getLayers(const qc::QuantumComputation& qc) {
 void CliffordSynthesizer::depthHeuristicSynthesis() {
   PLOG_INFO << "Optimizing Circuit with Heuristic";
   if (initialCircuit->getDepth() == 0) {
+    results.setResultCircuit(*initialCircuit);
     return;
   }
   auto optimalConfig = configuration;

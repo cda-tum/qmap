@@ -69,17 +69,18 @@ void SATEncoder::createFormulation() {
                             ? 2U * N
                             : N;
 
-  tableauEncoder = std::make_shared<TableauEncoder>(N, s, T, lb);
+  tableauEncoder = std::make_shared<TableauEncoder>(N, s, T + 2, lb);
   tableauEncoder->createTableauVariables();
   tableauEncoder->assertTableau(*config.initialTableau, 0U);
-  tableauEncoder->assertTableau(*config.targetTableau, T);
+  tableauEncoder->assertTableau(*config.targetTableau, T + 2);
+  tableauEncoder->assertMappingConstraints();
 
   if (config.useMultiGateEncoding) {
     gateEncoder = std::make_shared<MultiGateEncoder>(
-        N, s, T, tableauEncoder->getVariables(), lb);
+        N, s, T, tableauEncoder->getVariables(), lb, config.couplingMap);
   } else {
     gateEncoder = std::make_shared<SingleGateEncoder>(
-        N, s, T, tableauEncoder->getVariables(), lb);
+        N, s, T, tableauEncoder->getVariables(), lb, config.couplingMap);
   }
   gateEncoder->createSingleQubitGateVariables();
   gateEncoder->createTwoQubitGateVariables();
@@ -127,7 +128,9 @@ Result SATEncoder::solve() const {
 
 void SATEncoder::extractResultsFromModel(Results& res) const {
   auto* const model = lb->getModel();
-  tableauEncoder->extractTableauFromModel(res, T, *model);
+  // result is tableau with mapping applied
+  tableauEncoder->extractTableauFromModel(res, T + 1, *model);
+  tableauEncoder->extractMappingFromModel(res, *model);
   gateEncoder->extractCircuitFromModel(res, *model);
 }
 

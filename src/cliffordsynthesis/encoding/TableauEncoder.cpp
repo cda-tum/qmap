@@ -6,9 +6,11 @@
 #include "cliffordsynthesis/encoding/TableauEncoder.hpp"
 
 #include "Logic.hpp"
+#include "LogicTerm.hpp"
 #include "cliffordsynthesis/Results.hpp"
 #include "cliffordsynthesis/Tableau.hpp"
 #include "ir/operations/OpType.hpp"
+#include "logicblocks/Encodings.hpp"
 #include "logicblocks/Model.hpp"
 
 #include <cstddef>
@@ -17,6 +19,7 @@
 #include <stdexcept>
 #include <string>
 #include <utility>
+#include <vector>
 
 namespace cs::encoding {
 
@@ -48,10 +51,22 @@ void TableauEncoder::createTableauVariables() {
     PLOG_VERBOSE << "Creating variable " << rName;
     vars.r.emplace_back(lb->makeVariable(rName, CType::BITVECTOR, n));
   }
+  PLOG_DEBUG << "Creating mapping variables.";
+  vars.p.reserve(N);
+  for (std::size_t i = 0U; i < N; ++i) {
+    auto& g = vars.p.emplace_back();
+    g.reserve(N);
+    for (std::size_t j = 0U; j < N; ++j) {
+      const std::string pName =
+          "p_" + std::to_string(i) + "_" + std::to_string(j);
+      PLOG_VERBOSE << "Creating variable " << pName;
+      g.emplace_back(lb->makeVariable(pName));
+    }
+  }
 }
 
 void TableauEncoder::assertTableau(const Tableau& tableau,
-                                   const std::size_t t) {
+                                   const std::size_t t) const {
   const auto n = static_cast<std::uint16_t>(S);
 
   PLOG_DEBUG << "Asserting tableau at time step " << t;
@@ -68,6 +83,48 @@ void TableauEncoder::assertTableau(const Tableau& tableau,
   lb->assertFormula(vars.r[t] == LogicTerm(targetR, n));
 }
 
+void TableauEncoder::assertMappingConstraints() const {
+  // if p_i_j is set column i is mapped to column j between 0 and 1
+  for (std::size_t i = 0U; i < N; ++i) {
+    for (std::size_t j = 0U; j < N; ++j) {
+      lb->assertFormula(
+          LogicTerm::implies(vars.p[i][j], vars.x[1][j] == vars.x[0][i]));
+      lb->assertFormula(
+          LogicTerm::implies(vars.p[i][j], vars.z[1][j] == vars.z[0][i]));
+    }
+  }
+  // assert that r vals are unchanges between 0 and 1
+  lb->assertFormula(LogicTerm::eq(vars.r[0], vars.r[1]));
+
+  // assert that for every i and j exactly one p variable is set
+  for (std::size_t i = 0U; i < N; ++i) {
+    std::vector<encodings::NestedVar> rowVars;
+    for (std::size_t j = 0U; j < N; ++j) {
+      rowVars.emplace_back(vars.p[i][j]);
+    }
+    lb->assertFormula(
+        encodings::exactlyOneCmdr(rowVars, LogicTerm::noneTerm(), lb.get()));
+
+    std::vector<encodings::NestedVar> colVars;
+    for (std::size_t j = 0U; j < N; ++j) {
+      colVars.emplace_back(vars.p[j][i]);
+    }
+    lb->assertFormula(
+        encodings::exactlyOneCmdr(colVars, LogicTerm::noneTerm(), lb.get()));
+  }
+  // if p_i_j is set undo mapping between T-1 and T
+  for (std::size_t i = 0U; i < N; ++i) {
+    for (std::size_t j = 0U; j < N; ++j) {
+      lb->assertFormula(
+          LogicTerm::implies(vars.p[i][j], vars.x[T][i] == vars.x[T - 1][j]));
+      lb->assertFormula(
+          LogicTerm::implies(vars.p[i][j], vars.z[T][i] == vars.z[T - 1][j]));
+    }
+  }
+  // assert that r vals are unchanges between T-1 and T
+  lb->assertFormula(LogicTerm::eq(vars.r[T - 1], vars.r[T]));
+}
+
 void TableauEncoder::extractTableauFromModel(Results& results,
                                              const std::size_t t,
                                              Model& model) const {
@@ -82,6 +139,19 @@ void TableauEncoder::extractTableauFromModel(Results& results,
   tableau.populateTableauFrom(bvr, S, 2 * N);
 
   results.setResultTableau(tableau);
+}
+
+void TableauEncoder::extractMappingFromModel(Results& results,
+                                             Model& model) const {
+  const std::vector<bool> row(N, false);
+  std::vector<std::vector<bool>> permutationValues(N,
+                                                   std::vector<bool>(N, false));
+  for (std::size_t i = 0; i < N; ++i) {
+    for (std::size_t j = 0; j < N; ++j) {
+      permutationValues[i][j] = model.getBoolValue(vars.p[i][j], lb.get());
+    }
+  }
+  results.setMapping(permutationValues);
 }
 
 LogicTerm

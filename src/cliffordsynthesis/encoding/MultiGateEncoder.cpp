@@ -8,6 +8,7 @@
 #include "Logic.hpp"
 #include "ir/operations/OpType.hpp"
 #include "logicblocks/LogicTerm.hpp"
+#include "sc/utils.hpp"
 
 #include <cstddef>
 #include <cstdint>
@@ -46,12 +47,12 @@ void encoding::MultiGateEncoder::assertGateConstraints() {
   xorHelpers = logicbase::LogicMatrix{T};
   for (std::size_t t = 0U; t < T; ++t) {
     PLOG_VERBOSE << "Asserting gate constraints at time " << t;
-    rChanges = tvars->r[t];
-    splitXorR(tvars->r[t], t);
+    rChanges = tvars->r[t + 1];
+    splitXorR(tvars->r[t + 1], t);
     assertSingleQubitGateConstraints(t);
     assertTwoQubitGateConstraints(t);
     PLOG_VERBOSE << "Asserting r changes at time " << t;
-    lb->assertFormula(tvars->r[t + 1] == xorHelpers[t].back());
+    lb->assertFormula(tvars->r[t + 2] == xorHelpers[t].back());
   }
 }
 
@@ -69,7 +70,7 @@ void MultiGateEncoder::assertRConstraints(const std::size_t pos,
   for (const auto gate : SINGLE_QUBIT_GATES) {
     const auto& change =
         LogicTerm::ite(vars.gS[pos][gateToIndex(gate)][qubit],
-                       tvars->singleQubitRChange(pos, qubit, gate),
+                       tvars->singleQubitRChange(pos + 1, qubit, gate),
                        LogicTerm(0, static_cast<std::uint16_t>(S)));
     splitXorR(change, pos);
   }
@@ -83,6 +84,12 @@ void encoding::MultiGateEncoder::assertTwoQubitGateConstraints(
       if (ctrl == trgt) {
         continue;
       }
+      // if no connection between ctrl and trgt then assert variable is false
+      if (couplingMap.find(Edge{ctrl, trgt}) == couplingMap.end()) {
+        PLOG_DEBUG << "Asserting no CNOT on " << ctrl << " and " << trgt;
+        lb->assertFormula(!twoQubitGates[ctrl][trgt]);
+        continue;
+      }
       const auto changes = createTwoQubitGateConstraint(pos, ctrl, trgt);
       lb->assertFormula(LogicTerm::implies(twoQubitGates[ctrl][trgt], changes));
 
@@ -94,16 +101,16 @@ void encoding::MultiGateEncoder::assertTwoQubitGateConstraints(
 LogicTerm encoding::MultiGateEncoder::createTwoQubitGateConstraint(
     std::size_t pos, std::size_t ctrl, std::size_t trgt) {
   auto changes = LogicTerm(true);
-  const auto [xCtrl, xTrgt] = tvars->twoQubitXChange(pos, ctrl, trgt);
-  const auto [zCtrl, zTrgt] = tvars->twoQubitZChange(pos, ctrl, trgt);
+  const auto [xCtrl, xTrgt] = tvars->twoQubitXChange(pos + 1, ctrl, trgt);
+  const auto [zCtrl, zTrgt] = tvars->twoQubitZChange(pos + 1, ctrl, trgt);
 
-  changes = changes && (tvars->x[pos + 1][ctrl] == xCtrl);
-  changes = changes && (tvars->x[pos + 1][trgt] == xTrgt);
-  changes = changes && (tvars->z[pos + 1][ctrl] == zCtrl);
-  changes = changes && (tvars->z[pos + 1][trgt] == zTrgt);
+  changes = changes && (tvars->x[pos + 2][ctrl] == xCtrl);
+  changes = changes && (tvars->x[pos + 2][trgt] == xTrgt);
+  changes = changes && (tvars->z[pos + 2][ctrl] == zCtrl);
+  changes = changes && (tvars->z[pos + 2][trgt] == zTrgt);
 
   const auto& newRChanges = LogicTerm::ite(
-      vars.gC[pos][ctrl][trgt], tvars->twoQubitRChange(pos, ctrl, trgt),
+      vars.gC[pos][ctrl][trgt], tvars->twoQubitRChange(pos + 1, ctrl, trgt),
       LogicTerm(0, static_cast<std::uint16_t>(S)));
   splitXorR(newRChanges, pos);
   return changes;

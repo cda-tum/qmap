@@ -640,6 +640,11 @@ PYBIND11_MODULE(pyqmap, m, py::mod_gil_not_used()) {
       .def_property_readonly("tableau", &cs::Results::getResultTableau,
                              "Returns a string representation of the "
                              "synthesized circuit's tableau.")
+      .def_property_readonly(
+          "mapping", &cs::Results::getMappingVector,
+          "Returns a vector of vectors representing the mapping.")
+      .def_property_readonly("mapping_string", &cs::Results::getMapping,
+                             "Returns a string representation of the mapping.")
       .def("sat", &cs::Results::sat,
            "Returns `true` if the synthesis was successful.")
       .def("unsat", &cs::Results::unsat,
@@ -708,6 +713,28 @@ PYBIND11_MODULE(pyqmap, m, py::mod_gil_not_used()) {
       "qc"_a,
       "Constructs a synthesizer for a quantum computation representing the "
       "target state that starts in an initial state represented by a tableau.");
+  synthesizer.def(py::init<cs::Tableau, cs::Tableau, CouplingMap>(),
+                  "initial_tableau"_a, "target_tableau"_a, "coupling_map"_a,
+                  "Constructs a synthesizer for two tableaus representing the "
+                  "initial and target state with a coupling map.");
+
+  synthesizer.def(py::init<cs::Tableau, CouplingMap>(), "target_tableau"_a,
+                  "coupling_map"_a,
+                  "Constructs a synthesizer for a tableau representing the "
+                  "target state with a coupling map.");
+
+  synthesizer.def(py::init<qc::QuantumComputation&, CouplingMap, bool>(),
+                  "qc"_a, "coupling_map"_a,
+                  "use_destabilizers"_a
+                  "Constructs a synthesizer for a quantum computation "
+                  "representing the target state with a coupling map.");
+
+  synthesizer.def(
+      py::init<cs::Tableau, qc::QuantumComputation&, CouplingMap>(),
+      "initial_tableau"_a, "qc"_a, "coupling_map"_a,
+      "Constructs a synthesizer for a quantum computation representing the "
+      "target state that starts in an initial state represented by a tableau "
+      "with a coupling map.");
   synthesizer.def("synthesize", &cs::CliffordSynthesizer::synthesize,
                   "config"_a = cs::Configuration(),
                   "Runs the synthesis with the given configuration.");

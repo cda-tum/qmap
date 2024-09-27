@@ -7,6 +7,7 @@
 
 #include "Logic.hpp"
 #include "ir/operations/OpType.hpp"
+#include "sc/utils.hpp"
 
 #include <cstddef>
 #include <plog/Log.h>
@@ -71,6 +72,11 @@ void SingleGateEncoder::assertTwoQubitGateConstraints(const std::size_t pos) {
       if (ctrl == trgt) {
         continue;
       }
+      if (couplingMap.find(Edge{ctrl, trgt}) == couplingMap.end()) {
+        PLOG_DEBUG << "Asserting no CNOT on " << ctrl << " and " << trgt;
+        lb->assertFormula(!twoQubitGates[ctrl][trgt]);
+        continue;
+      }
       const auto changes = createTwoQubitGateConstraint(pos, ctrl, trgt);
 
       PLOG_DEBUG << "Asserting CNOT on " << ctrl << " and " << trgt;
@@ -83,16 +89,16 @@ void SingleGateEncoder::assertTwoQubitGateConstraints(const std::size_t pos) {
 LogicTerm SingleGateEncoder::createTwoQubitGateConstraint(
     const std::size_t pos, const std::size_t ctrl, const std::size_t trgt) {
   auto changes = LogicTerm(true);
-  const auto [xCtrl, xTrgt] = tvars->twoQubitXChange(pos, ctrl, trgt);
-  const auto [zCtrl, zTrgt] = tvars->twoQubitZChange(pos, ctrl, trgt);
+  const auto [xCtrl, xTrgt] = tvars->twoQubitXChange(pos + 1, ctrl, trgt);
+  const auto [zCtrl, zTrgt] = tvars->twoQubitZChange(pos + 1, ctrl, trgt);
 
-  changes = changes && (tvars->x[pos + 1][ctrl] == xCtrl);
-  changes = changes && (tvars->x[pos + 1][trgt] == xTrgt);
-  changes = changes && (tvars->z[pos + 1][ctrl] == zCtrl);
-  changes = changes && (tvars->z[pos + 1][trgt] == zTrgt);
-  changes =
-      changes && (tvars->r[pos + 1] ==
-                  (tvars->r[pos] ^ tvars->twoQubitRChange(pos, ctrl, trgt)));
+  changes = changes && (tvars->x[pos + 2][ctrl] == xCtrl);
+  changes = changes && (tvars->x[pos + 2][trgt] == xTrgt);
+  changes = changes && (tvars->z[pos + 2][ctrl] == zCtrl);
+  changes = changes && (tvars->z[pos + 2][trgt] == zTrgt);
+  changes = changes &&
+            (tvars->r[pos + 2] ==
+             (tvars->r[pos + 1] ^ tvars->twoQubitRChange(pos + 1, ctrl, trgt)));
 
   return changes;
 }
@@ -100,8 +106,8 @@ LogicTerm SingleGateEncoder::createTwoQubitGateConstraint(
 LogicTerm SingleGateEncoder::createNoChangeOnQubit(const std::size_t pos,
                                                    const std::size_t q) {
   auto noChange = LogicTerm(true);
-  noChange = noChange && (tvars->x[pos + 1][q] == tvars->x[pos][q]);
-  noChange = noChange && (tvars->z[pos + 1][q] == tvars->z[pos][q]);
+  noChange = noChange && (tvars->x[pos + 2][q] == tvars->x[pos + 1][q]);
+  noChange = noChange && (tvars->z[pos + 2][q] == tvars->z[pos + 1][q]);
   return noChange;
 }
 

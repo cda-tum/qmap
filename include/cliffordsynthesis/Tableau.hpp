@@ -163,5 +163,10 @@ public:
   [[nodiscard]] std::uint64_t getBVFrom(const std::size_t column) const {
     return getBVFrom<64>(column).to_ullong();
   }
+  Tableau applyMapping(const std::vector<std::vector<bool>>& p);
+  Tableau reverseMappingOnRows(const std::vector<std::vector<bool>>& p,
+                               size_t nq);
+  void rref();
+  bool equivalentUpToStabilizer(const Tableau* t) const;
 };
 } // namespace cs
