@@ -86,6 +86,7 @@ repos:
           - pytest
           - rustworkx
           - mqt.qcec
+          - mqt.core>=3.0.0b3
 
   # Check for spelling
   - repo: https://github.com/crate-ci/typos

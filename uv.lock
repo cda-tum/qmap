@@ -611,11 +611,11 @@ wheels = [
 
 [[package]]
 name = "executing"
-version = "2.1.0"
+version = "2.2.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/8c/e3/7d45f492c2c4a0e8e0fad57d081a7c8a0286cdd86372b070cca1ec0caa1e/executing-2.1.0.tar.gz", hash = "sha256:8ea27ddd260da8150fa5a708269c4a10e76161e2496ec3e587da9e3c0fe4b9ab", size = 977485 }
+sdist = { url = "https://files.pythonhosted.org/packages/91/50/a9d80c47ff289c611ff12e63f7c5d13942c65d68125160cefd768c73e6e4/executing-2.2.0.tar.gz", hash = "sha256:5d108c028108fe2551d1a7b2e8b713341e2cb4fc0aa7dcf966fa4327a5226755", size = 978693 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b5/fd/afcd0496feca3276f509df3dbd5dae726fcc756f1a08d9e25abe1733f962/executing-2.1.0-py2.py3-none-any.whl", hash = "sha256:8d63781349375b5ebccc3142f4b30350c0cd9c79f921cde38be2be4637e98eaf", size = 25805 },
+    { url = "https://files.pythonhosted.org/packages/7b/8f/c4d9bafc34ad7ad5d8dc16dd1347ee0e507a52c3adb6bfa8887e1c6a26ba/executing-2.2.0-py2.py3-none-any.whl", hash = "sha256:11387150cad388d62750327a53d3339fad4888b39a6fe233c3afbb54ecffd3aa", size = 26702 },
 ]
 
 [[package]]
@@ -1363,6 +1363,44 @@ wheels = [
 ]
 
 [[package]]
+name = "mqt-core"
+version = "3.0.0b3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/37/bf/0a0535ca6b1c0169f012b4f3718ec512b25469f6f4ade9fa9ce9aafc73fd/mqt_core-3.0.0b3.tar.gz", hash = "sha256:08179dde05185653db32fdcf4687941c49e43ccafca7178282f7c3f48db2425d", size = 408163 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/33/02/af18600f35c76a4b3491d482ccda320e36ad8754baea55594d507d5af1c4/mqt_core-3.0.0b3-cp310-cp310-macosx_10_15_x86_64.whl", hash = "sha256:65997b165ee90c250c3aea6c04c342c19ef10023858f931a8281dc5eeeb0e9e8", size = 3181615 },
+    { url = "https://files.pythonhosted.org/packages/a0/d8/ada0e72a2e4db98de62670426cd16a478898ad2c53f6edef5a18a1d6cc95/mqt_core-3.0.0b3-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:f50be5101a9dace80ed0df58c604f4feed6bb8fa8c9444ce4ce9bda73176b353", size = 2934170 },
+    { url = "https://files.pythonhosted.org/packages/6d/3c/c4a4f0906e9f0d8cc31aaf79bc9da23670ae6dbc30929f47d47a1bd2780e/mqt_core-3.0.0b3-cp310-cp310-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:2e0f2eb1cb8738aefd8ccd9c2510d58de9848cb5d537799d817f86f4ec31cc1c", size = 3543082 },
+    { url = "https://files.pythonhosted.org/packages/2c/6f/45f16880b9a69d2b8632c31fe4792710dd1fb2792fa2a4dde4f1b7a52ba6/mqt_core-3.0.0b3-cp310-cp310-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:ba4aa8b051326a67668fb3ef132b95cf44994d94901f8d5f37ca17f1873e8267", size = 3766014 },
+    { url = "https://files.pythonhosted.org/packages/84/4f/484c16d05fad248b8b8237f31ad6184e42b92ad3fd79e02bf6dc1fb8051f/mqt_core-3.0.0b3-cp310-cp310-win_amd64.whl", hash = "sha256:02e34b719ceca70a1855f276805203391f516aca4f70aa62ca21b147046b7bb8", size = 4269303 },
+    { url = "https://files.pythonhosted.org/packages/44/f0/aab6618a95c54923f7e4e09a387cf672d74c94cba67b3c8f8130f3a38a38/mqt_core-3.0.0b3-cp311-cp311-macosx_10_15_x86_64.whl", hash = "sha256:6e20e4d6c89ddd4c85258cc48e860b9fd8c9dab6c3051a7d7649cc087e0d0aed", size = 3182548 },
+    { url = "https://files.pythonhosted.org/packages/dd/31/418585c255a25940f5404f26627d72848056f5da568e5f09b8734bbac6cd/mqt_core-3.0.0b3-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:ec6496e288b5d34ee5e1147ae413693f301c3fa4737c36f1e6f409e7bed03cbb", size = 2935061 },
+    { url = "https://files.pythonhosted.org/packages/de/73/d833a070ea470b8e58b289fbf63a9eefe599ac79c2fb208b15e79c3fbb7b/mqt_core-3.0.0b3-cp311-cp311-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:06d949673c0cf80d0ab5dcdfbdc7d0093a49d491c63846a4a02a31013ee4a38a", size = 3543652 },
+    { url = "https://files.pythonhosted.org/packages/c9/b3/bc93eb019bc0338fcec049e430fbcefa7bb0248c7ece7dce4d3d3db5fb3c/mqt_core-3.0.0b3-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:83888ec14a338a82c4f9aca88dbc8578738f3a01c0e5ceb88d67fa994849abd4", size = 3766485 },
+    { url = "https://files.pythonhosted.org/packages/49/2e/208da0048e19b95d375f7773fe76bdb74481c75f7973b4bf4973b87e77ed/mqt_core-3.0.0b3-cp311-cp311-win_amd64.whl", hash = "sha256:3e7ac959d7114826eaf5677d9c2211d98cd649d044eed1cd5e161f73b066c730", size = 4269841 },
+    { url = "https://files.pythonhosted.org/packages/f5/e0/6953a94ebd7334a2c193b5ace73d7a81b6056227a76ab6e4fa566b2341fe/mqt_core-3.0.0b3-cp312-cp312-macosx_10_15_x86_64.whl", hash = "sha256:5109b8cbc701ba726b29a3ead42d106429da9d5ba275bb8a1e3a7a325fd568c3", size = 3214182 },
+    { url = "https://files.pythonhosted.org/packages/18/c9/349b8f3709328ca347e8b07c6c65ec372af88754b3e630b1280877f66d91/mqt_core-3.0.0b3-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:eca25ddd169bc5e675a25f92da40c5aaa554247de211647cc7adad5eef028140", size = 2962637 },
+    { url = "https://files.pythonhosted.org/packages/a4/9a/638751710c53accd71dd48f8d7c2a225efbdca514768d77a0188f62c1c8d/mqt_core-3.0.0b3-cp312-cp312-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:d8d9fb4e01edd8e47237a195111e1cb53ee8d6473a5b41fbcb6bb302ec6c6dee", size = 3543615 },
+    { url = "https://files.pythonhosted.org/packages/ad/6a/4384e2ffb0662f6960134e51e5fb3500f4bf43ae465cfd7c2d4a21bd8db9/mqt_core-3.0.0b3-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:b06da4ba4b32fb925eafb43cdf71beca0c1448e18343644ae32285c872680738", size = 3766400 },
+    { url = "https://files.pythonhosted.org/packages/54/5b/abf16f89a7d478aed67c135fa155be8dc86ac575ea6c4cdbf4339fdd896a/mqt_core-3.0.0b3-cp312-cp312-win_amd64.whl", hash = "sha256:ef2ef20181ebdae0e0ddc7e796d27c623d1ebdbe9325e38f51ae09d743d73aad", size = 4270462 },
+    { url = "https://files.pythonhosted.org/packages/f5/ec/7ba3d1b3c26242e4c9aac0de376587a5b9d8f38f1fbe7ad9f855232cb020/mqt_core-3.0.0b3-cp313-cp313-macosx_10_15_x86_64.whl", hash = "sha256:f5642c1ae6d5a09672c71243243ca920149bf54a89fe015218648bf03eb419b8", size = 3213915 },
+    { url = "https://files.pythonhosted.org/packages/b0/33/8f6342fff87ffea96863174f05e53b12d0946d67d0453fa567020994bfce/mqt_core-3.0.0b3-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:ed257a3109dbef3d893946bbdad382e0d53cb3ca3066019fad82c54b4b253161", size = 2962387 },
+    { url = "https://files.pythonhosted.org/packages/fb/e7/2ffcf76deb67e26659c528b31b41bce8d63d9ff0ef9e8bc15bbbbb9e3e80/mqt_core-3.0.0b3-cp313-cp313-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:f77c9bb1ab75063c8fcfdc15f6ffbcb81b46ea15d61e185280aa1d544d55273e", size = 3543654 },
+    { url = "https://files.pythonhosted.org/packages/86/85/e443d10af387a54b208fe783a7ab699df3dda7e61e9cb3af11f5295ac024/mqt_core-3.0.0b3-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:144795e25059d1504e9ead2bced8fa784e171432fddfbf9adb5a601c4db36a10", size = 3766498 },
+    { url = "https://files.pythonhosted.org/packages/0b/62/7112c80f4fdf66c6d35ca8d573d925514039f33c455c48fd406fd1ed3cd1/mqt_core-3.0.0b3-cp313-cp313-win_amd64.whl", hash = "sha256:941a103de19b25d9e8643efb3f4ebf8916482ee673eb6cb850d034857724f831", size = 4270459 },
+    { url = "https://files.pythonhosted.org/packages/da/8c/f4d5b41d855975e58a55c662394e1cf239e28740973eb19795390b141dc1/mqt_core-3.0.0b3-cp313-cp313t-macosx_10_15_x86_64.whl", hash = "sha256:ff2c1c51ca385f6dd8043415293e18c0418cf7421c9f06a49ab686272b5fdabc", size = 3216682 },
+    { url = "https://files.pythonhosted.org/packages/a4/de/69166faa2ea27c93b48082a689ea793b6d8104880bfd72da6df5adf0e46e/mqt_core-3.0.0b3-cp313-cp313t-macosx_11_0_arm64.whl", hash = "sha256:387a959fd2dbf636e5ccc53e5942de70f44f67aa8c7a1c851961bace5c8dad63", size = 2969536 },
+    { url = "https://files.pythonhosted.org/packages/41/20/ac21302bff7fe5f1c69f37579ec0866a8b85d176b7585f89e51f1e61fc83/mqt_core-3.0.0b3-cp313-cp313t-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:cc7bd38fd7f166ca2a75843827de6c53c1391267e8ccc09e97846c974e7b0a33", size = 3545565 },
+    { url = "https://files.pythonhosted.org/packages/a0/7b/996b5fc971bfbff005d396457ced58d00d0c732c13c976dfeac9b58db0e8/mqt_core-3.0.0b3-cp313-cp313t-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:f607f352b07a772edaa3dae88d80df2b9c6c9afd60f92683cd060a18353c1ff8", size = 3768593 },
+    { url = "https://files.pythonhosted.org/packages/7f/d7/09582290c89a4f3a28bc158d04c1e45257c2b7ef12685677e6933bf21c19/mqt_core-3.0.0b3-cp313-cp313t-win_amd64.whl", hash = "sha256:80e9f9dcf74e1d7978de7d4399e51dcbc23dbfa076c8be1433c39f1832a3282f", size = 4293765 },
+    { url = "https://files.pythonhosted.org/packages/c7/bd/a2e53e2203d326a27f49b1b53a132bfe5b22d2780bf0be97c7555416c33e/mqt_core-3.0.0b3-cp39-cp39-macosx_10_15_x86_64.whl", hash = "sha256:2e5efc4226f005e69e80f48a52fe59cfad2359ae3028a0f89fa5df58e3787d91", size = 3181589 },
+    { url = "https://files.pythonhosted.org/packages/7c/c6/3c6eef0395e9e1497005a4da46ce4d14dc752542c00e685b33f4a7dc8e29/mqt_core-3.0.0b3-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:a6d6db6d2a43704dc6dacdb28f002d50c6968b1d9816e0abeb6cedc76c34bc30", size = 2934252 },
+    { url = "https://files.pythonhosted.org/packages/73/38/bfcbf1ee32af1a0031866e84d0240c01795842ced580dd9774cd44f602f8/mqt_core-3.0.0b3-cp39-cp39-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:b346d9775787343fb00032c22a722ca006b3127176258806974561fa0eae0ae4", size = 3543334 },
+    { url = "https://files.pythonhosted.org/packages/2c/3c/93e7f3d0b8566a7ee8ec78113938d1fc89fdffd6dec24970c4173fec8037/mqt_core-3.0.0b3-cp39-cp39-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:58faa851c3c19ac7cccd48e7d253b3b98c151e7f91bfc1693cbd22d804bc044b", size = 3766020 },
+    { url = "https://files.pythonhosted.org/packages/02/26/910e62d750e6bccf8370fbbb3fe225f6a66e798b2c03c0b38971fff1882d/mqt_core-3.0.0b3-cp39-cp39-win_amd64.whl", hash = "sha256:98a9d170fc4179d9027e44350b15b8bca3a388b8b20eb3fa6b565572c3f50e0c", size = 4269967 },
+]
+
+[[package]]
 name = "mqt-qcec"
 version = "2.8.1"
 source = { registry = "https://pypi.org/simple" }
@@ -1422,6 +1460,7 @@ name = "mqt-qmap"
 source = { editable = "." }
 dependencies = [
     { name = "importlib-resources", marker = "python_full_version < '3.10'" },
+    { name = "mqt-core" },
     { name = "qiskit", extra = ["qasm3-import"] },
     { name = "rustworkx", extra = ["all"] },
     { name = "typing-extensions", marker = "python_full_version < '3.10'" },
@@ -1439,16 +1478,22 @@ visualization = [
 
 [package.dev-dependencies]
 build = [
+    { name = "mqt-core" },
     { name = "pybind11" },
     { name = "scikit-build-core" },
     { name = "setuptools-scm" },
 ]
 dev = [
+    { name = "distinctipy" },
     { name = "furo" },
     { name = "ipykernel" },
+    { name = "ipywidgets" },
+    { name = "mqt-core" },
     { name = "mqt-qcec" },
-    { name = "mqt-qmap", extra = ["visualization"] },
     { name = "nbsphinx" },
+    { name = "networkx", version = "3.2.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
+    { name = "networkx", version = "3.4.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
+    { name = "plotly" },
     { name = "pybind11" },
     { name = "pytest" },
     { name = "pytest-cov" },
@@ -1463,12 +1508,17 @@ dev = [
     { name = "sphinxcontrib-bibtex" },
     { name = "sphinxcontrib-svg2pdfconverter" },
     { name = "sphinxext-opengraph" },
+    { name = "walkerlayout" },
 ]
 docs = [
+    { name = "distinctipy" },
     { name = "furo" },
     { name = "ipykernel" },
-    { name = "mqt-qmap", extra = ["visualization"] },
+    { name = "ipywidgets" },
     { name = "nbsphinx" },
+    { name = "networkx", version = "3.2.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
+    { name = "networkx", version = "3.4.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
+    { name = "plotly" },
     { name = "qiskit", extra = ["visualization"] },
     { name = "setuptools-scm" },
     { name = "sphinx-autoapi" },
@@ -1479,12 +1529,18 @@ docs = [
     { name = "sphinxcontrib-bibtex" },
     { name = "sphinxcontrib-svg2pdfconverter" },
     { name = "sphinxext-opengraph" },
+    { name = "walkerlayout" },
 ]
 test = [
+    { name = "distinctipy" },
+    { name = "ipywidgets" },
     { name = "mqt-qcec" },
-    { name = "mqt-qmap", extra = ["visualization"] },
+    { name = "networkx", version = "3.2.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
+    { name = "networkx", version = "3.4.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
+    { name = "plotly" },
     { name = "pytest" },
     { name = "pytest-cov" },
+    { name = "walkerlayout" },
 ]
 
 [package.metadata]
@@ -1492,6 +1548,7 @@ requires-dist = [
     { name = "distinctipy", marker = "extra == 'visualization'", specifier = ">=1.2.2" },
     { name = "importlib-resources", marker = "python_full_version < '3.10'", specifier = ">=5.0" },
     { name = "ipywidgets", marker = "extra == 'visualization'", specifier = ">=7.6.5" },
+    { name = "mqt-core", specifier = ">=3.0.0b3" },
     { name = "networkx", marker = "extra == 'visualization'", specifier = ">=2.5" },
     { name = "plotly", marker = "extra == 'visualization'", specifier = ">=5.15.0" },
     { name = "qiskit", extras = ["qasm3-import"], specifier = ">=1.0.0" },
@@ -1502,16 +1559,21 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 build = [
+    { name = "mqt-core", specifier = ">=3.0.0b3" },
     { name = "pybind11", specifier = ">=2.13.6" },
     { name = "scikit-build-core", specifier = ">=0.10.7" },
     { name = "setuptools-scm", specifier = ">=8.1" },
 ]
 dev = [
+    { name = "distinctipy", specifier = ">=1.2.2" },
     { name = "furo", specifier = ">=2024.8.6" },
     { name = "ipykernel", specifier = ">=6.29.5" },
+    { name = "ipywidgets", specifier = ">=7.6.5" },
+    { name = "mqt-core", specifier = ">=3.0.0b3" },
     { name = "mqt-qcec", specifier = ">=2.4.5" },
-    { name = "mqt-qmap", extras = ["visualization"], editable = "." },
     { name = "nbsphinx", specifier = ">=0.9.6" },
+    { name = "networkx", specifier = ">=2.5" },
+    { name = "plotly", specifier = ">=5.15.0" },
     { name = "pybind11", specifier = ">=2.13.6" },
     { name = "pytest", specifier = ">=8.3.4" },
     { name = "pytest-cov", specifier = ">=6" },
@@ -1525,12 +1587,16 @@ dev = [
     { name = "sphinxcontrib-bibtex", specifier = ">=2.6.3" },
     { name = "sphinxcontrib-svg2pdfconverter", specifier = ">=1.2.3" },
     { name = "sphinxext-opengraph", specifier = ">=0.9.1" },
+    { name = "walkerlayout", specifier = ">=1.0.2" },
 ]
 docs = [
+    { name = "distinctipy", specifier = ">=1.2.2" },
     { name = "furo", specifier = ">=2024.8.6" },
     { name = "ipykernel", specifier = ">=6.29.5" },
-    { name = "mqt-qmap", extras = ["visualization"], editable = "." },
+    { name = "ipywidgets", specifier = ">=7.6.5" },
     { name = "nbsphinx", specifier = ">=0.9.6" },
+    { name = "networkx", specifier = ">=2.5" },
+    { name = "plotly", specifier = ">=5.15.0" },
     { name = "qiskit", extras = ["visualization"], specifier = ">=1.0.0" },
     { name = "setuptools-scm", specifier = ">=8.1" },
     { name = "sphinx-autoapi", specifier = ">=3.4.0" },
@@ -1540,12 +1606,17 @@ docs = [
     { name = "sphinxcontrib-bibtex", specifier = ">=2.6.3" },
     { name = "sphinxcontrib-svg2pdfconverter", specifier = ">=1.2.3" },
     { name = "sphinxext-opengraph", specifier = ">=0.9.1" },
+    { name = "walkerlayout", specifier = ">=1.0.2" },
 ]
 test = [
+    { name = "distinctipy", specifier = ">=1.2.2" },
+    { name = "ipywidgets", specifier = ">=7.6.5" },
     { name = "mqt-qcec", specifier = ">=2.4.5" },
-    { name = "mqt-qmap", extras = ["visualization"], editable = "." },
+    { name = "networkx", specifier = ">=2.5" },
+    { name = "plotly", specifier = ">=5.15.0" },
     { name = "pytest", specifier = ">=8.3.4" },
     { name = "pytest-cov", specifier = ">=6" },
+    { name = "walkerlayout", specifier = ">=1.0.2" },
 ]
 
 [[package]]
