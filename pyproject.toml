@@ -304,20 +304,33 @@ manylinux-aarch64-image = "manylinux_2_28"
 manylinux-ppc64le-image = "manylinux_2_28"
 manylinux-s390x-image = "manylinux_2_28"
 
+# The mqt-core shared libraries are provided by the mqt-core Python package.
+# They should not be vendorized into the mqt-qcec wheel. This requires
+# excluding the shared libraries from the repair process.
+
 [tool.cibuildwheel.linux]
 environment = { Z3_ROOT="/opt/python/cp311-cp311/lib/python3.11/site-packages/z3", DEPLOY="ON" }
 before-all = "/opt/python/cp311-cp311/bin/pip install z3-solver==4.12.6"
 repair-wheel-command = [
     "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/python/cp311-cp311/lib/python3.11/site-packages/z3/lib",
-    "auditwheel repair -w {dest_dir} {wheel}",
+  """auditwheel repair -w {dest_dir} {wheel} \
+--exclude libmqt-core-ir.so.3.0 \
+--exclude libmqt-core-circuit-optimizer.so.3.0 \
+--exclude libmqt-core-ds.so.3.0 \
+--exclude libmqt-core-na.so.3.0""",
 ]
 
 [tool.cibuildwheel.macos]
 environment = { MACOSX_DEPLOYMENT_TARGET = "11.0" }
+repair-wheel-command = "delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel} --ignore-missing-dependencies"
 
 [tool.cibuildwheel.windows]
-before-build = "pip install delvewheel>=1.7.3"
-repair-wheel-command = "delvewheel repair -v -w {dest_dir} {wheel} --namespace-pkg mqt"
+before-build = "uv pip install delvewheel>=1.9.0"
+repair-wheel-command = """delvewheel repair -w {dest_dir} {wheel} --namespace-pkg mqt \
+--exclude mqt-core-ir.dll \
+--exclude mqt-core-circuit-optimizer.dll \
+--exclude mqt-core-ds.dll \
+--exclude mqt-core-na.dll"""
 environment = { CMAKE_GENERATOR = "Ninja" }
 
 
