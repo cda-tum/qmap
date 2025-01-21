@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from mqt.core import load
-from mqt.qmap.na import NAStatePreparationSolver, generate_code, get_ops_for_solver
+from mqt.qmap.na.state_preparation import NAStatePreparationSolver, generate_code, get_ops_for_solver
 
 # get root directory of the project
 circ_dir = Path(__file__).resolve().parent.parent.parent / "na/nasp/circuits"
