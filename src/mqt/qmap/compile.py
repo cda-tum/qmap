@@ -41,6 +41,14 @@ from .pyqmap import (
     map,  # noqa: A004
 )
 
+__all__ = [
+    "compile",
+]
+
+
+def __dir__() -> list[str]:
+    return __all__
+
 
 def extract_initial_layout_from_qasm(qasm: str, qregs: list[QuantumRegister]) -> Layout:
     """Extract the initial layout resulting from compiling a circuit from a QASM file.

@@ -21,6 +21,15 @@ from .pyqmap import (
     Tableau,
 )
 
+__all__ = [
+    "optimize_clifford",
+    "synthesize_clifford",
+]
+
+
+def __dir__() -> list[str]:
+    return __all__
+
 
 def _reverse_paulis(paulis: list[str]) -> list[str]:
     return [s[0] + s[:0:-1] if s[0] in "+-" else s[::-1] for s in paulis]

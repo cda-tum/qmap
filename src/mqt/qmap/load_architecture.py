@@ -6,6 +6,14 @@ from qiskit.providers import Backend
 
 from .pyqmap import Arch, Architecture
 
+__all__ = [
+    "load_architecture",
+]
+
+
+def __dir__() -> list[str]:
+    return __all__
+
 
 def load_architecture(arch: str | Arch | Architecture | Backend | None = None) -> Architecture:
     """Load an architecture from a string, Arch, Architecture, or Backend. If None is passed, no architecture is loaded.

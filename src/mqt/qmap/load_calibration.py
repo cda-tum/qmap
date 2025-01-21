@@ -10,6 +10,14 @@ from qiskit.transpiler.target import Target
 if TYPE_CHECKING:
     from .pyqmap import Architecture
 
+__all__ = [
+    "load_calibration",
+]
+
+
+def __dir__() -> list[str]:
+    return __all__
+
 
 def load_calibration(architecture: Architecture, calibration: str | Target | BackendProperties | None = None) -> None:
     """Load a calibration from a string, BackendProperties, or Target.
