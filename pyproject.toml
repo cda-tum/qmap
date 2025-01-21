@@ -71,14 +71,14 @@ minimum-version = "build-system.requires"
 # Set the wheel install directory
 wheel.install-dir = "mqt/qmap"
 
+# Explicitly set the package directory
+wheel.packages = ["src/mqt"]
+
 # Set required Ninja version
 ninja.version = ">=1.10"
 
 # Setuptools-style build caching in a local directory
 build-dir = "build/{wheel_tag}/{build_type}"
-
-# Explicitly set the package directory
-wheel.packages = ["src/mqt"]
 
 # Only build the Python bindings target
 build.targets = ["pyqmap"]
@@ -101,6 +101,7 @@ sdist.exclude = [
 [tool.scikit-build.cmake.define]
 BUILD_MQT_QMAP_TESTS = "OFF"
 BUILD_MQT_QMAP_BINDINGS = "ON"
+ENABLE_IPO = "ON"
 
 [[tool.scikit-build.overrides]]
 if.python-version = ">=3.13"
@@ -180,6 +181,7 @@ ignore = ["W002"]  # Triggers on __init__.py's
 
 [tool.ruff]
 line-length = 120
+namespace-packages = ["mqt"]
 preview = true
 unsafe-fixes = true
 
@@ -316,12 +318,9 @@ before-build = "pip install delvewheel>=1.7.3"
 repair-wheel-command = "delvewheel repair -v -w {dest_dir} {wheel} --namespace-pkg mqt"
 environment = { CMAKE_GENERATOR = "Ninja" }
 
-[[tool.cibuildwheel.overrides]]
-select = "*-macosx_arm64"
-environment = { MACOSX_DEPLOYMENT_TARGET = "11.0" }
-
 
 [tool.uv]
+required-version = ">=0.5.20"
 reinstall-package = ["mqt.qmap"]
 
 
