@@ -5,8 +5,8 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from qiskit import QuantumCircuit
 
+from mqt.core import load
 from mqt.qmap import HybridMapperParameters, HybridNAMapper, NeutralAtomHybridArchitecture
 
 arch_dir = Path(__file__).parent.parent / "hybridmap" / "architectures"
@@ -48,8 +48,7 @@ def test_hybrid_na_mapper(
     )
     mapper = HybridNAMapper(arch, params=params)
 
-    # Create a simple circuit
-    qc = QuantumCircuit.from_qasm_file(str(circuit_dir / circuit_filename))
+    qc = load(circuit_dir / circuit_filename)
 
     mapper.map(qc)
     results = mapper.schedule(create_animation_csv=False)
@@ -70,7 +69,7 @@ def test_keep_alive() -> None:
     """Test the keep alive feature of the python bindings."""
     mapper = _nested_mapper_create()
 
-    qc = QuantumCircuit.from_qasm_file(str(circuit_dir / "dj_nativegates_rigetti_qiskit_opt3_10.qasm"))
+    qc = load(circuit_dir / "dj_nativegates_rigetti_qiskit_opt3_10.qasm")
 
     mapper.map(qc)
     results = mapper.schedule(create_animation_csv=False)

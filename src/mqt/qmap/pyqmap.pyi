@@ -1,6 +1,6 @@
 from typing import Any, ClassVar, overload
 
-from qiskit import QuantumCircuit
+from mqt.core.ir import QuantumComputation
 
 class Arch:
     __members__: ClassVar[dict[Arch, int]] = ...  # read-only
@@ -393,7 +393,7 @@ class SwapReduction:
     @property
     def value(self) -> int: ...
 
-def map(circ: str | QuantumCircuit, arch: Architecture, config: Configuration) -> MappingResults: ...  # noqa: A001
+def map(circ: QuantumComputation, arch: Architecture, config: Configuration) -> MappingResults: ...  # noqa: A001
 
 class TargetMetric:
     __members__: ClassVar[dict[TargetMetric, int]] = ...  # read-only
@@ -488,15 +488,6 @@ class SynthesisResults:
     @property
     def two_qubit_gates(self) -> int: ...
 
-class QuantumComputation:
-    def __init__(self) -> None: ...
-    @staticmethod
-    def from_file(file: str) -> QuantumComputation: ...
-    @staticmethod
-    def from_qasm_str(qasm: str) -> QuantumComputation: ...
-    @staticmethod
-    def from_qiskit(circuit: QuantumCircuit) -> QuantumComputation: ...
-
 class Tableau:
     @overload
     def __init__(self, n: int, include_stabilizers: bool = False) -> None: ...
@@ -586,7 +577,9 @@ class HybridNAMapper:
     def get_init_hw_pos(self) -> dict[int, int]: ...
     def get_mapped_qc(self) -> str: ...
     def get_mapped_qc_aod(self) -> str: ...
-    def map(self, circ: object, initial_mapping: InitialCircuitMapping = ..., verbose: bool = ...) -> None: ...
+    def map(
+        self, circ: QuantumComputation, initial_mapping: InitialCircuitMapping = ..., verbose: bool = ...
+    ) -> None: ...
     def map_qasm_file(
         self, filename: str, initial_mapping: InitialCircuitMapping = ..., verbose: bool = ...
     ) -> None: ...
@@ -662,13 +655,13 @@ class NAStatePreparationSolver:
     ) -> Result: ...
 
 def get_ops_for_solver(
-    circ: QuantumCircuit | QuantumComputation,
+    circ: QuantumComputation,
     operation_type: str,
     num_controls: int,
     quiet: bool = ...,
 ) -> list[tuple[int, int]]: ...
 def generate_code(
-    circ: QuantumCircuit | QuantumComputation,
+    circ: QuantumComputation,
     result: NAStatePreparationSolver.Result,
     min_atom_dist: int = ...,
     no_interaction_radius: int = ...,

@@ -32,7 +32,6 @@ target_link_libraries(
           MQT::QMapSCHeuristic
           MQT::QMapCliffordSynthesis
           MQT::QMapHybrid
-          MQT::CorePython
           MQT::NASP
           MQT::ProjectOptions
           MQT::ProjectWarnings
