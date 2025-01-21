@@ -231,6 +231,6 @@ def test_invalid_opt_cand_arg(ibm_guadalupe: SubarchitectureOrder) -> None:
     """Verify that invalid arguments for optimal candidates raise an error."""
     with pytest.raises(
         ValueError,
-        match="Number of qubits must not be smaller or equal 0 or larger then number of physical qubits of architecture.",
+        match=r"Number of qubits must not be smaller or equal 0 or larger then number of physical qubits of architecture.",
     ):
         ibm_guadalupe.optimal_candidates(100)
