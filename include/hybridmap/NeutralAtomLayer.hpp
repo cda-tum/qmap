@@ -9,6 +9,8 @@
 #include "hybridmap/NeutralAtomDefinitions.hpp"
 
 #include <cstdint>
+#include <deque>
+#include <memory>
 #include <set>
 #include <utility>
 #include <vector>
@@ -24,8 +26,12 @@ namespace na {
 
 class NeutralAtomLayer {
 protected:
-  qc::DAG dag;
-  qc::DAGIterators iterators;
+  using DAG = std::vector<std::deque<std::unique_ptr<qc::Operation>*>>;
+  using DAGIterator = std::deque<std::unique_ptr<qc::Operation>*>::iterator;
+  using DAGIterators = std::vector<DAGIterator>;
+
+  DAG dag;
+  DAGIterators iterators;
   GateList gates;
   GateList mappedSingleQubitGates;
   std::vector<GateList> candidates;
@@ -58,7 +64,7 @@ protected:
 
 public:
   // Constructor
-  explicit NeutralAtomLayer(qc::DAG graph) : dag(std::move(graph)) {
+  explicit NeutralAtomLayer(DAG graph) : dag(std::move(graph)) {
     iterators.reserve(dag.size());
     candidates.reserve(dag.size());
     for (auto& i : dag) {
