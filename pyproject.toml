@@ -1,8 +1,8 @@
 [build-system]
 requires = [
-  "scikit-build-core>=0.10.1",
+  "scikit-build-core>=0.10.7",
   "setuptools-scm>=8.1",
-  "pybind11>=2.13.5",
+  "pybind11>=2.13.6",
 ]
 build-backend = "scikit_build_core.build"
 
@@ -50,20 +50,6 @@ dependencies = [
 dynamic = ["version"]
 
 [project.optional-dependencies]
-test = ["pytest>=7.2", "mqt.qcec>=2.4.5", "mqt.qmap[visualization]"]
-coverage = ["mqt.qmap[test]", "pytest-cov>=4"]
-docs = [
-    "furo>=2023.9.10",
-    "setuptools-scm>=8.1",
-    "sphinxcontrib-bibtex>=2.4.2",
-    "sphinx-copybutton>=0.5",
-    "ipykernel",
-    "nbsphinx",
-    "sphinxext-opengraph>=0.9",
-    "sphinx-autodoc-typehints",
-    "qiskit[visualization]",
-    "mqt.qmap[visualization]"
-]
 visualization = [
     "distinctipy>=1.2.2",
     "plotly>=5.15.0",
@@ -71,7 +57,6 @@ visualization = [
     "walkerlayout>=1.0.2",
     "ipywidgets>=7.6.5",
 ]
-dev = ["mqt.qmap[coverage, docs]"]
 
 [project.urls]
 Homepage = "https://github.com/cda-tum/mqt-qmap"
@@ -305,8 +290,9 @@ ignore = ["GH200"]
 build = "cp3*"
 skip = "*-musllinux*"
 archs = "auto64"
-test-command = "python -c \"from mqt import qmap\""
-test-skip = ["cp313*"] # skip testing on Python 3.13 until our dependencies are ready
+test-groups = ["test"]
+test-command = "pytest {project}/test/python"
+test-skip = ["cp3*t-*"] # skip testing on free-threading Python until our dependencies are ready
 build-frontend = "build[uv]"
 enable = ["cpython-freethreading"]
 manylinux-x86_64-image = "manylinux_2_28"
@@ -337,3 +323,49 @@ environment = { MACOSX_DEPLOYMENT_TARGET = "11.0" }
 
 [tool.uv]
 reinstall-package = ["mqt.qmap"]
+
+
+[tool.uv.sources]
+mqt-qmap = { workspace = true }
+
+[dependency-groups]
+build = [
+  "pybind11>=2.13.6",
+  "scikit-build-core>=0.10.7",
+  "setuptools-scm>=8.1",
+]
+docs = [
+  "networkx>=2.5",
+  "plotly>=5.15.0",
+  "distinctipy>=1.2.2",
+  "walkerlayout>=1.0.2",
+  "ipywidgets>=7.6.5",
+  "furo>=2024.8.6",
+  "qiskit[visualization]>=1.0.0",
+  "setuptools-scm>=8.1",
+  "sphinx-autoapi>=3.4.0",
+  "sphinx-copybutton>=0.5.2",
+  "sphinx-design>=0.6.1",
+  "sphinxcontrib-bibtex>=2.6.3",
+  "sphinxcontrib-svg2pdfconverter>=1.2.3",
+  "sphinxext-opengraph>=0.9.1",
+  "ipykernel>=6.29.5",
+  "nbsphinx>=0.9.6",
+  "sphinx-autodoc-typehints>=2.3.0",
+]
+test = [
+  "networkx>=2.5",
+  "plotly>=5.15.0",
+  "distinctipy>=1.2.2",
+  "walkerlayout>=1.0.2",
+  "ipywidgets>=7.6.5",
+  "pytest>=8.3.4",
+  "pytest-cov>=6",
+  "mqt.qcec>=2.4.5",
+  "mqt.core>=3.0.0b2",
+]
+dev = [
+  {include-group = "build"},
+  {include-group = "docs"},
+  {include-group = "test"},
+]
