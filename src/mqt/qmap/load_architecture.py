@@ -29,7 +29,7 @@ def load_architecture(arch: str | Arch | Architecture | Backend | None = None) -
         elif isinstance(arch, Architecture):
             architecture = arch
         elif isinstance(arch, Backend):
-            from mqt.qmap.qiskit.backend import import_backend
+            from mqt.qmap.plugins.qiskit import import_backend
 
             architecture = import_backend(arch)
         else:  # pragma: no cover
