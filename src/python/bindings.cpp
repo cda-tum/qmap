@@ -966,11 +966,11 @@ whether idle qubits should be shielded from the entangling operations.
 :param num_stages: is the number of stages in the sequence
 :param num_transfers: (optional) is the number of transfers in the sequence
 :param mind_ops_order: is True if the order of the operations should be
-preserved
+  preserved
 :param shield_idle_qubits: is True if idle qubits should be shielded
 :returns: the result of the solver
 :raises ValueError: if one of the numeral parameters is invalid, e.g., is a
-negative value
+  negative value
 )");
 
   py::class_<na::NASolver::Result>(
@@ -1008,13 +1008,12 @@ of the abstraction from the 2D grid used for the solver must be provided again.
 :param result: is the result of the solver
 :param min_atom_dist: is the minimum distance between atoms
 :param no_interaction_radius: is the radius around an atom where no other atom
-can be placed during an entangling operation that should not interact with the
-atom
+  can be placed during an entangling operation that should not interact with the
+  atom
 :param zone_dist: is the distance between zones, i.e., the minimal distance
-        between two atoms in different zones
+  between two atoms in different zones
 :raises ValueError: if one of the numeral parameters is invalid, e.g., is a
-negative value
-)");
+  negative value)");
 
   m.def(
       "get_ops_for_solver",
@@ -1038,15 +1037,15 @@ Extract entangling operations as list of qubit pairs from the circuit.
 
 :param qc: is the quantum circuit
 :param operation_type: is the type of operation to extract, e.g., "z" for CZ
-gates
+  gates
 :param num_controls: is the number of controls the operation acts on, e.g., 1
-for CZ gates
+  for CZ gates
 :param quiet: if True, suppresses warning when the circuit contains operations
-other than the specified operation type
+  other than the specified operation type
 :return: list of qubit pairs
 :raises ValueError: if the circuit contains operations other than the specified
-operation type and quiet is False
+  operation type and quiet is False
 :raises ValueError: if the operation has more than two operands including
-controls
+  controls
 )");
 }
