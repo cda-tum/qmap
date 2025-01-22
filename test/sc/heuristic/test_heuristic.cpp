@@ -1299,33 +1299,21 @@ TEST(Functionality, DataLogger) {
   const auto& singleQubitFidelityCosts =
       architecture.getSingleQubitFidelityCosts();
   for (std::size_t i = 0; i < singleQubitFidelityCosts.size(); ++i) {
-    if (std::isinf(singleQubitFidelityCosts[i])) {
-      EXPECT_TRUE(fidelityJson["single_qubit_fidelity_costs"][i].is_null());
-    } else {
-      EXPECT_EQ(fidelityJson["single_qubit_fidelity_costs"][i],
-                singleQubitFidelityCosts[i]);
-    }
+    EXPECT_EQ(fidelityJson["single_qubit_fidelity_costs"][i],
+              singleQubitFidelityCosts[i]);
   }
   const auto& twoQubitFidelityCosts = architecture.getTwoQubitFidelityCosts();
   for (std::size_t i = 0; i < twoQubitFidelityCosts.size(); ++i) {
     for (std::size_t j = 0; j < twoQubitFidelityCosts[i].size(); ++j) {
-      if (std::isinf(twoQubitFidelityCosts[i][j])) {
-        EXPECT_TRUE(fidelityJson["two_qubit_fidelity_costs"][i][j].is_null());
-      } else {
-        EXPECT_EQ(fidelityJson["two_qubit_fidelity_costs"][i][j],
-                  twoQubitFidelityCosts[i][j]);
-      }
+      EXPECT_EQ(fidelityJson["two_qubit_fidelity_costs"][i][j],
+                twoQubitFidelityCosts[i][j]);
     }
   }
   const auto& swapFidelityCosts = architecture.getSwapFidelityCosts();
   for (std::size_t i = 0; i < swapFidelityCosts.size(); ++i) {
     for (std::size_t j = 0; j < swapFidelityCosts[i].size(); ++j) {
-      if (std::isinf(swapFidelityCosts[i][j])) {
-        EXPECT_TRUE(fidelityJson["swap_fidelity_costs"][i][j].is_null());
-      } else {
-        EXPECT_EQ(fidelityJson["swap_fidelity_costs"][i][j],
-                  swapFidelityCosts[i][j]);
-      }
+      EXPECT_EQ(fidelityJson["swap_fidelity_costs"][i][j],
+                swapFidelityCosts[i][j]);
     }
   }
 

@@ -334,7 +334,7 @@ int LogicTerm::getIntValue() const {
   case CType::BITVECTOR:
     return static_cast<int>(bvValue);
   default:
-    return std::numeric_limits<int>::infinity();
+    return std::numeric_limits<int>::max();
   }
 }
 
@@ -349,7 +349,7 @@ double LogicTerm::getFloatValue() const {
   case CType::BITVECTOR:
     return static_cast<double>(bvValue);
   default:
-    return std::numeric_limits<double>::infinity();
+    return std::numeric_limits<double>::max();
   }
 }
 
@@ -364,7 +364,7 @@ uint64_t LogicTerm::getBitVectorValue() const {
   case CType::BITVECTOR:
     return bvValue & (static_cast<uint64_t>(std::pow(2, bvSize)) - 1U);
   default:
-    return std::numeric_limits<uint64_t>::infinity();
+    return std::numeric_limits<uint64_t>::max();
   }
 }
 
@@ -379,7 +379,7 @@ uint16_t LogicTerm::getBitVectorSize() const {
   case CType::BITVECTOR:
     return bvSize;
   default:
-    return std::numeric_limits<uint16_t>::infinity();
+    return std::numeric_limits<uint16_t>::max();
   }
 }
 
