@@ -17,14 +17,24 @@ if sys.platform == "win32":
         import sysconfig
         from pathlib import Path
 
-        bin_dir = Path(sysconfig.get_paths()["purelib"]) / "mqt" / "core" / "bin"
+        site_packages = Path(sysconfig.get_paths()["purelib"])
+        bin_dir = site_packages / "mqt" / "core" / "bin"
         os.add_dll_directory(str(bin_dir))
 
-        if sys.version_info >= (3, 9, 0) and "Z3_ROOT" in os.environ:
+        if "Z3_ROOT" in os.environ:
             lib_path = Path(os.environ["Z3_ROOT"]) / "lib"
             if lib_path.exists():
                 os.add_dll_directory(str(lib_path))
             bin_path = Path(os.environ["Z3_ROOT"]) / "bin"
+            if bin_path.exists():
+                os.add_dll_directory(str(bin_path))
+
+        z3_dir = site_packages / "z3"
+        if z3_dir.exists():
+            lib_path = z3_dir / "lib"
+            if lib_path.exists():
+                os.add_dll_directory(str(lib_path))
+            bin_path = z3_dir / "bin"
             if bin_path.exists():
                 os.add_dll_directory(str(bin_path))
 
