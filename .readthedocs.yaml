@@ -1,37 +1,41 @@
 version: 2
 
-submodules:
-  include: all
-  recursive: true
+formats:
+  #  - pdf
+  - htmlzip
 
 build:
-  os: ubuntu-22.04
+  os: ubuntu-24.04
   tools:
-    python: "3.11"
-  apt_packages:
-    - graphviz
-  jobs:
-    post_checkout:
-      # Skip docs build if the commit message contains "skip ci"
-      - (git --no-pager log --pretty="tformat:%s -- %b" -1 | grep -viq "skip ci") || exit 183
-      # Skip docs build if there are no changes related to docs
-      - |
-        if [ "$READTHEDOCS_VERSION_TYPE" = "external" ] && git diff --quiet origin/main -- docs/ .readthedocs.yaml src/mqt/ src/python include/python .github/contributing* .github/workflows/support*;
-        then
-          exit 183;
-        fi
-      # Unshallow the git clone and fetch tags to get proper version information
-      - git fetch --unshallow --tags
-    pre_install:
-      - wget https://github.com/Z3Prover/z3/releases/download/z3-4.12.2/z3-4.12.2-x64-glibc-2.35.zip
-      - unzip z3-4.12.2-x64-glibc-2.35.zip
+    python: "3.12"
+  commands:
+    # Skip docs build if the commit message contains "skip ci"
+    - (git --no-pager log --pretty="tformat:%s -- %b" -1 | grep -viq "skip ci") || exit 183
+    # Skip docs build if there are no changes related to docs
+    - |
+      if [ "$READTHEDOCS_VERSION_TYPE" = "external" ] && git diff --quiet origin/main -- docs/ .readthedocs.yaml src/mqt/ src/python include/*/python .github/contributing* .github/support*;
+      then
+        exit 183;
+      fi
+    # Set up uv and a virtual environment
+    - asdf plugin add uv
+    - asdf install uv latest
+    - asdf global uv latest
+    # Unshallow the git clone and fetch tags to get proper version information
+    - git fetch --unshallow --tags
+    - wget https://github.com/Z3Prover/z3/releases/download/z3-4.13.4/z3-4.13.4-x64-glibc-2.35.zip
+    - unzip z3-4.13.4-x64-glibc-2.35.zip -d ~/
+    # Run the html builder
+    - Z3_ROOT=~/z3-4.13.4-x64-glibc-2.35 uv run --frozen --no-dev --group docs -m sphinx -T -b html -d docs/_build/doctrees -D language=en docs $READTHEDOCS_OUTPUT/html
+    # Run the htmlzip builder and create a zip file
+    - Z3_ROOT=~/z3-4.13.4-x64-glibc-2.35 uv run --frozen --no-dev --group docs -m sphinx -T -b dirhtml -d docs/_build/doctrees -D language=en docs docs/_build/dirhtml
+    - mkdir -p $READTHEDOCS_OUTPUT/htmlzip
+    - zip -r $READTHEDOCS_OUTPUT/htmlzip/html.zip docs/_build/dirhtml/*
+    # Run the latex builder and create a pdf file
+#    - uv run --frozen --no-dev --group docs -m sphinx -T -b latex -d docs/_build/doctrees -D language=en docs docs/_build/latex
+#    - cd docs/_build/latex && latexmk -pdf -f -dvi- -ps- -interaction=nonstopmode -jobname=$READTHEDOCS_PROJECT
+#    - mkdir -p $READTHEDOCS_OUTPUT/pdf
+#    - cp docs/_build/latex/$READTHEDOCS_PROJECT.pdf $READTHEDOCS_OUTPUT/pdf/$READTHEDOCS_PROJECT.pdf
 
 sphinx:
   configuration: docs/conf.py
-
-python:
-  install:
-    - method: pip
-      path: .
-      extra_requirements:
-        - docs
