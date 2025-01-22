@@ -9,7 +9,7 @@
 #include <optional>
 #include <stdexcept>
 #include <tuple>
-#include <yaml-cpp/node/parse.h>
+#include <yaml-cpp/yaml.h> // NOLINT(*-include-cleaner)
 
 TEST(Solver, SteaneDoubleSidedStorage) {
   const auto& circ = qc::QuantumComputation(TEST_CIRCUITS_PATH "/steane.qasm");
@@ -166,6 +166,6 @@ TEST(Solver, YAMLRoundTrip) {
       solver.solve(pairs, static_cast<uint16_t>(circ.getNqubits()), 4,
                    std::nullopt, false, true);
   const auto resultRT = na::NASolver::Result::fromYAML(
-      YAML::Load(result.yaml())); // Round-Tripped result
+      YAML::Load(result.yaml())); // NOLINT(*-include-cleaner)
   EXPECT_EQ(resultRT, result);
 }
