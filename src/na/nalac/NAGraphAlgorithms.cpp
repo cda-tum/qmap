@@ -583,7 +583,7 @@ auto NAGraphAlgorithms::computeSequence(const InteractionGraph& g,
           // it is the rightmost atom (w/o position)
           const auto leftNeighbor = std::accumulate(
               moveablePositions.at(t).cbegin(), moveablePositions.at(t).cend(),
-              std::make_pair(0UL, 0LL),
+              std::make_pair(0UL, -1LL),
               [](const std::pair<const qc::Qubit, std::int64_t>& acc,
                  const auto& value) {
                 if (value.second > acc.second) {
