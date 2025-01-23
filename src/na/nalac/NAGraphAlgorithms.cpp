@@ -519,8 +519,6 @@ auto NAGraphAlgorithms::computeSequence(const InteractionGraph& g,
                                         });
                                   }),
                    sequence.end());
-    // recalculate resting positions
-    resting = computeRestingPositions(sequence, fixed, coloring);
   }
 
   // compute relative x positions of moveable vertices at every timestamp
