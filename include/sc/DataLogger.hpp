@@ -28,11 +28,26 @@ public:
     initLog();
     logArchitecture();
     logInputCircuit(inputCircuit);
-    for (std::size_t i = 0; i < inputCircuit.getNqubits(); ++i) {
-      qregs.emplace_back("q", "q[" + std::to_string(i) + "]");
+
+    // collect registers
+    auto combinedRegs = inputCircuit.getQuantumRegisters();
+    for (const auto& reg : inputCircuit.getAncillaRegisters()) {
+      combinedRegs.emplace(reg);
     }
-    for (std::size_t i = 0; i < inputCircuit.getNcbits(); ++i) {
-      cregs.emplace_back("c", "c[" + std::to_string(i) + "]");
+
+    // build qubit index -> register map
+    for (const auto& [_, reg] : combinedRegs) {
+      const auto bound = reg.getStartIndex() + reg.getSize();
+      for (qc::Qubit i = reg.getStartIndex(); i < bound; ++i) {
+        qregs.try_emplace(i, reg, reg.toString(i));
+      }
+    }
+    // build classical index -> register map
+    for (const auto& [_, reg] : inputCircuit.getClassicalRegisters()) {
+      const auto bound = reg.getStartIndex() + reg.getSize();
+      for (qc::Bit i = reg.getStartIndex(); i < bound; ++i) {
+        cregs.try_emplace(i, reg, reg.toString(i));
+      }
     }
   }
 
@@ -75,8 +90,8 @@ protected:
   Architecture* architecture;
   std::uint16_t nqubits;
   qc::QuantumComputation inputCircuit;
-  qc::RegisterNames qregs;
-  qc::RegisterNames cregs;
+  qc::QubitIndexToRegisterMap qregs;
+  qc::BitIndexToRegisterMap cregs;
   std::vector<std::ofstream> searchNodesLogFiles; // 1 per layer
   bool deactivated = false;
 

@@ -3,63 +3,72 @@
 // See README.md or go to https://github.com/cda-tum/qmap for more information.
 //
 
+#include "Definitions.hpp"
 #include "cliffordsynthesis/CliffordSynthesizer.hpp"
+#include "cliffordsynthesis/Configuration.hpp"
+#include "cliffordsynthesis/Results.hpp"
+#include "cliffordsynthesis/Tableau.hpp"
+#include "cliffordsynthesis/TargetMetric.hpp"
 #include "hybridmap/HybridNeutralAtomMapper.hpp"
+#include "hybridmap/NeutralAtomArchitecture.hpp"
 #include "hybridmap/NeutralAtomScheduler.hpp"
+#include "hybridmap/NeutralAtomUtils.hpp"
+#include "ir/QuantumComputation.hpp"
 #include "ir/operations/OpType.hpp"
 #include "na/NAComputation.hpp"
 #include "na/NADefinitions.hpp"
 #include "na/nasp/CodeGenerator.hpp"
 #include "na/nasp/Solver.hpp"
 #include "na/nasp/SolverFactory.hpp"
-#include "python/qiskit/QuantumCircuit.hpp"
+#include "sc/Architecture.hpp"
+#include "sc/Mapper.hpp"
+#include "sc/MappingResults.hpp"
+#include "sc/configuration/AvailableArchitecture.hpp"
+#include "sc/configuration/CommanderGrouping.hpp"
+#include "sc/configuration/Configuration.hpp"
+#include "sc/configuration/EarlyTermination.hpp"
+#include "sc/configuration/Encoding.hpp"
+#include "sc/configuration/Heuristic.hpp"
+#include "sc/configuration/InitialLayout.hpp"
+#include "sc/configuration/Layering.hpp"
+#include "sc/configuration/LookaheadHeuristic.hpp"
+#include "sc/configuration/Method.hpp"
+#include "sc/configuration/SwapReduction.hpp"
 #include "sc/exact/ExactMapper.hpp"
 #include "sc/heuristic/HeuristicMapper.hpp"
+#include "sc/utils.hpp"
 
+#include <algorithm>
 #include <cstdint>
+#include <exception>
+#include <memory>
 #include <nlohmann/json.hpp>
+#include <plog/Severity.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11_json/pybind11_json.hpp>
+#include <sstream>
+#include <stdexcept>
 #include <string>
 
 namespace py = pybind11;
 using namespace pybind11::literals;
 
-void loadQC(qc::QuantumComputation& qc, const py::object& circ) {
-  try {
-    if (py::isinstance<py::str>(circ)) {
-      auto&& file = circ.cast<std::string>();
-      qc.import(file);
-    } else {
-      qc::qiskit::QuantumCircuit::import(qc, circ);
-    }
-  } catch (std::exception const& e) {
-    std::stringstream ss{};
-    ss << "Could not import circuit: " << e.what();
-    throw std::invalid_argument(ss.str());
-  }
-}
-
 // c++ binding function
-MappingResults map(const py::object& circ, Architecture& arch,
+MappingResults map(const qc::QuantumComputation& circ, Architecture& arch,
                    Configuration& config) {
-  qc::QuantumComputation qc{};
-
-  loadQC(qc, circ);
-
   if (config.useTeleportation) {
     config.teleportationQubits =
-        std::min((arch.getNqubits() - qc.getNqubits()) & ~1U,
+        std::min((arch.getNqubits() - circ.getNqubits()) & ~1U,
                  static_cast<std::size_t>(8));
   }
 
   std::unique_ptr<Mapper> mapper;
   try {
     if (config.method == Method::Heuristic) {
-      mapper = std::make_unique<HeuristicMapper>(qc, arch);
+      mapper = std::make_unique<HeuristicMapper>(circ, arch);
     } else if (config.method == Method::Exact) {
-      mapper = std::make_unique<ExactMapper>(qc, arch);
+      mapper = std::make_unique<ExactMapper>(circ, arch);
     }
   } catch (std::exception const& e) {
     std::stringstream ss{};
@@ -667,35 +676,6 @@ PYBIND11_MODULE(pyqmap, m, py::mod_gil_not_used()) {
       "Constructs a tableau from two lists of Pauli strings, the Stabilizers"
       "and Destabilizers.");
 
-  auto quantumComputation = py::class_<qc::QuantumComputation>(
-      m, "QuantumComputation",
-      "A class for the intermediate representation of quantum circuits in the "
-      "Munich Quantum Toolkit.");
-  quantumComputation.def_static(
-      "from_file",
-      [](const std::string& filename) {
-        return qc::QuantumComputation(filename);
-      },
-      "filename"_a, "Reads a quantum circuit from a file.");
-  quantumComputation.def_static(
-      "from_qasm_str",
-      [](const std::string& qasm) {
-        std::stringstream ss(qasm);
-        qc::QuantumComputation qc{};
-        qc.import(ss, qc::Format::OpenQASM3);
-        return qc;
-      },
-      "qasm"_a, "Reads a quantum circuit from a qasm string.");
-  quantumComputation.def_static(
-      "from_qiskit",
-      [](const py::object& circuit) {
-        qc::QuantumComputation qc{};
-        qc::qiskit::QuantumCircuit::import(qc, circuit);
-        return qc;
-      },
-      "circuit"_a,
-      "Reads a quantum circuit from a Qiskit :class:`QuantumCircuit`.");
-
   auto synthesizer = py::class_<cs::CliffordSynthesizer>(
       m, "CliffordSynthesizer", "A class for synthesizing Clifford circuits.");
 
@@ -863,21 +843,14 @@ PYBIND11_MODULE(pyqmap, m, py::mod_gil_not_used()) {
       .def(
           "get_init_hw_pos", &na::NeutralAtomMapper::getInitHwPos,
           "Get the initial hardware positions, required to create an animation")
-      .def(
-          "map",
-          [](na::NeutralAtomMapper& mapper, const py::object& circ,
-             na::InitialMapping initialMapping, bool verbose) {
-            qc::QuantumComputation qc{};
-            loadQC(qc, circ);
-            mapper.mapAndConvert(qc, initialMapping, verbose);
-          },
-          "Map a quantum circuit to the neutral atom quantum computer",
-          "circ"_a, "initial_mapping"_a = na::InitialMapping::Identity,
-          "verbose"_a = false)
+      .def("map", &na::NeutralAtomMapper::mapAndConvert,
+           "Map a quantum circuit to the neutral atom quantum computer",
+           "circ"_a, "initial_mapping"_a = na::InitialMapping::Identity,
+           "verbose"_a = false)
       .def(
           "map_qasm_file",
           [](na::NeutralAtomMapper& mapper, const std::string& filename,
-             na::InitialMapping initialMapping) {
+             const na::InitialMapping initialMapping) {
             qc::QuantumComputation qc(filename);
             mapper.map(qc, initialMapping);
           },
@@ -897,10 +870,10 @@ PYBIND11_MODULE(pyqmap, m, py::mod_gil_not_used()) {
            "filename"_a)
       .def(
           "schedule",
-          [](na::NeutralAtomMapper& mapper, bool verbose,
-             bool create_animation_csv, double shuttling_speed_factor) {
-            auto results = mapper.schedule(verbose, create_animation_csv,
-                                           shuttling_speed_factor);
+          [](na::NeutralAtomMapper& mapper, const bool verbose,
+             const bool createAnimationCsv, const double shuttlingSpeedFactor) {
+            auto results = mapper.schedule(verbose, createAnimationCsv,
+                                           shuttlingSpeedFactor);
             return results.toMap();
           },
           "Schedule the mapped circuit", "verbose"_a = false,
@@ -993,11 +966,11 @@ whether idle qubits should be shielded from the entangling operations.
 :param num_stages: is the number of stages in the sequence
 :param num_transfers: (optional) is the number of transfers in the sequence
 :param mind_ops_order: is True if the order of the operations should be
-preserved
+  preserved
 :param shield_idle_qubits: is True if idle qubits should be shielded
 :returns: the result of the solver
 :raises ValueError: if one of the numeral parameters is invalid, e.g., is a
-negative value
+  negative value
 )");
 
   py::class_<na::NASolver::Result>(
@@ -1019,38 +992,33 @@ compact
 
   m.def(
       "generate_code",
-      [](const py::object& circ, const na::NASolver::Result& result,
-         uint16_t minAtomDist, uint16_t noInteractionRadius,
-         uint16_t zoneDist) {
-        qc::QuantumComputation qc{};
-        loadQC(qc, circ);
+      [](const qc::QuantumComputation& qc, const na::NASolver::Result& result,
+         const uint16_t minAtomDist, const uint16_t noInteractionRadius,
+         const uint16_t zoneDist) {
         return na::CodeGenerator::generate(qc, result, minAtomDist,
                                            noInteractionRadius, zoneDist)
             .toString();
       },
-      "circ"_a, "result"_a, "min_atom_dist"_a = 1,
-      "no_interaction_radius"_a = 10, "zone_dist"_a = 24, R"(
+      "qc"_a, "result"_a, "min_atom_dist"_a = 1, "no_interaction_radius"_a = 10,
+      "zone_dist"_a = 24, R"(
 Generate code for the given circuit using the solver's result. Some parameters
 of the abstraction from the 2D grid used for the solver must be provided again.
 
-:param circ: is the quantum circuit
+:param qc: is the quantum circuit
 :param result: is the result of the solver
 :param min_atom_dist: is the minimum distance between atoms
 :param no_interaction_radius: is the radius around an atom where no other atom
-can be placed during an entangling operation that should not interact with the
-atom
+  can be placed during an entangling operation that should not interact with the
+  atom
 :param zone_dist: is the distance between zones, i.e., the minimal distance
-        between two atoms in different zones
+  between two atoms in different zones
 :raises ValueError: if one of the numeral parameters is invalid, e.g., is a
-negative value
-)");
+  negative value)");
 
   m.def(
       "get_ops_for_solver",
-      [](const py::object& circ, const std::string& operationType,
+      [](const qc::QuantumComputation& qc, const std::string& operationType,
          const uint64_t numControls, const bool quiet) {
-        qc::QuantumComputation qc{};
-        loadQC(qc, circ);
         auto opTypeLowerStr = operationType;
         std::transform(opTypeLowerStr.begin(), opTypeLowerStr.end(),
                        opTypeLowerStr.begin(),
@@ -1059,25 +1027,25 @@ negative value
             na::FullOpType{qc::opTypeFromString(operationType), numControls};
         return na::SolverFactory::getOpsForSolver(qc, fullOpType, quiet);
       },
-      "circ"_a, "operation_type"_a = "Z", "num_operands"_a = 1,
-      "quiet"_a = true, R"(
+      "qc"_a, "operation_type"_a = "Z", "num_operands"_a = 1, "quiet"_a = true,
+      R"(
 Extract entangling operations as list of qubit pairs from the circuit.
 
 .. warning::
     This function can only extract qubit pairs of two-qubit operations.
     I.e., the operands of the operation plus the controls must be equal to two.
 
-:param circ: is the quantum circuit
+:param qc: is the quantum circuit
 :param operation_type: is the type of operation to extract, e.g., "z" for CZ
-gates
+  gates
 :param num_controls: is the number of controls the operation acts on, e.g., 1
-for CZ gates
+  for CZ gates
 :param quiet: if True, suppresses warning when the circuit contains operations
-other than the specified operation type
+  other than the specified operation type
 :return: list of qubit pairs
 :raises ValueError: if the circuit contains operations other than the specified
-operation type and quiet is False
+  operation type and quiet is False
 :raises ValueError: if the operation has more than two operands including
-controls
+  controls
 )");
 }

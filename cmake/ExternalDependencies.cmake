@@ -11,6 +11,19 @@ if(NOT Z3_FOUND)
 endif()
 
 if(BUILD_MQT_QMAP_BINDINGS)
+  # Manually detect the installed mqt-core package.
+  execute_process(
+    COMMAND "${Python_EXECUTABLE}" -m mqt.core --cmake_dir
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    OUTPUT_VARIABLE mqt-core_DIR
+    ERROR_QUIET)
+
+  # Add the detected directory to the CMake prefix path.
+  if(mqt-core_DIR)
+    list(APPEND CMAKE_PREFIX_PATH "${mqt-core_DIR}")
+    message(STATUS "Found mqt-core package: ${mqt-core_DIR}")
+  endif()
+
   if(NOT SKBUILD)
     # Manually detect the installed pybind11 package.
     execute_process(
@@ -27,9 +40,9 @@ if(BUILD_MQT_QMAP_BINDINGS)
 endif()
 
 # cmake-format: off
-set(MQT_CORE_VERSION 2.6.1
+set(MQT_CORE_VERSION 3.0.0
     CACHE STRING "MQT Core version")
-set(MQT_CORE_REV "41eea72cdbefbd86ba06f76dc41a911950dd3081"
+set(MQT_CORE_REV "4176e32376f0289f616bde18e9dbb2f1333a85fb"
     CACHE STRING "MQT Core identifier (tag, branch or commit hash)")
 set(MQT_CORE_REPO_OWNER "cda-tum"
     CACHE STRING "MQT Core repository owner (change when using a fork)")
@@ -49,6 +62,24 @@ else()
       GIT_REPOSITORY https://github.com/${MQT_CORE_REPO_OWNER}/mqt-core.git
       GIT_TAG ${MQT_CORE_REV})
     list(APPEND FETCH_PACKAGES mqt-core)
+  endif()
+endif()
+
+set(JSON_VERSION
+    3.11.3
+    CACHE STRING "nlohmann_json version")
+set(JSON_URL https://github.com/nlohmann/json/releases/download/v${JSON_VERSION}/json.tar.xz)
+set(JSON_SystemInclude
+    ON
+    CACHE INTERNAL "Treat the library headers like system headers")
+if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
+  FetchContent_Declare(nlohmann_json URL ${JSON_URL} FIND_PACKAGE_ARGS ${JSON_VERSION})
+  list(APPEND FETCH_PACKAGES nlohmann_json)
+else()
+  find_package(nlohmann_json ${JSON_VERSION} QUIET)
+  if(NOT nlohmann_json_FOUND)
+    FetchContent_Declare(nlohmann_json URL ${JSON_URL})
+    list(APPEND FETCH_PACKAGES nlohmann_json)
   endif()
 endif()
 

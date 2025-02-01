@@ -2,31 +2,33 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from .compile import CircuitInputType
 
 from qiskit import QuantumCircuit, qasm3
 from qiskit.quantum_info import Clifford, PauliList
 from qiskit.transpiler.layout import TranspileLayout
 
+from mqt.core import load
+
 from .compile import extract_initial_layout_from_qasm
 from .pyqmap import (
     CliffordSynthesizer,
-    QuantumComputation,
     SynthesisConfiguration,
     SynthesisResults,
     Tableau,
 )
 
+__all__ = [
+    "optimize_clifford",
+    "synthesize_clifford",
+]
 
-def _import_circuit(circuit: str | QuantumCircuit | QuantumComputation) -> QuantumComputation:
-    """Import a circuit from a string, a QuantumCircuit, or a QuantumComputation."""
-    if isinstance(circuit, QuantumCircuit):
-        return QuantumComputation.from_qiskit(circuit)
-    if isinstance(circuit, str):
-        if circuit.endswith(".qasm"):
-            return QuantumComputation.from_file(circuit)
-        return QuantumComputation.from_qasm_str(circuit)
-    return circuit
+
+def __dir__() -> list[str]:
+    return __all__
 
 
 def _reverse_paulis(paulis: list[str]) -> list[str]:
@@ -138,7 +140,7 @@ def synthesize_clifford(
 
 
 def optimize_clifford(
-    circuit: str | QuantumCircuit | QuantumComputation,
+    circuit: CircuitInputType,
     initial_tableau: str | Clifford | PauliList | Tableau | None = None,
     include_destabilizers: bool = False,
     **kwargs: Any,  # noqa: ANN401
@@ -168,7 +170,7 @@ def optimize_clifford(
     """
     config = _config_from_kwargs(kwargs)
 
-    qc = _import_circuit(circuit)
+    qc = load(circuit)
     if initial_tableau is not None:
         synthesizer = CliffordSynthesizer(_import_tableau(initial_tableau, include_destabilizers), qc)
     else:

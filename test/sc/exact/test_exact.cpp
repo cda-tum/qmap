@@ -411,7 +411,7 @@ TEST_F(ExactTest, MapToSubsetNotIncludingQ0) {
   EXPECT_EQ(qcMapped.initialLayout.size(), 4U);
   EXPECT_EQ(qcMapped.initialLayout[0], 3);
   EXPECT_EQ(qcMapped.outputPermutation.size(), 3U);
-  EXPECT_TRUE(qcMapped.garbage.at(3));
+  EXPECT_TRUE(qcMapped.getGarbage().at(3));
 }
 
 TEST_F(ExactTest, WCNF) {

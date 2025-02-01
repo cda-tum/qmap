@@ -5,9 +5,9 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from qiskit import QuantumCircuit
 
-from mqt.qmap.na import NAStatePreparationSolver, generate_code, get_ops_for_solver
+from mqt.core import load
+from mqt.qmap.na.state_preparation import NAStatePreparationSolver, generate_code, get_ops_for_solver
 
 # get root directory of the project
 circ_dir = Path(__file__).resolve().parent.parent.parent / "na/nasp/circuits"
@@ -28,7 +28,7 @@ def solver() -> NAStatePreparationSolver:
 )
 def test_na_state_prep_sat(solver: NAStatePreparationSolver, circuit_filename: str, n_qubits: int) -> None:
     """Test the state preparation for the zoned neutral atom architecture."""
-    qc = QuantumCircuit.from_qasm_file(circ_dir / circuit_filename)
+    qc = load(circ_dir / circuit_filename)
     ops = get_ops_for_solver(qc, "z", 1)
     assert ops is not None
     assert len(ops) > 0
@@ -48,7 +48,7 @@ def test_na_state_prep_sat(solver: NAStatePreparationSolver, circuit_filename: s
 )
 def test_na_state_prep_unsat(solver: NAStatePreparationSolver, circuit_filename: str, n_qubits: int) -> None:
     """Test the state preparation for the zoned neutral atom architecture."""
-    qc = QuantumCircuit.from_qasm_file(circ_dir / circuit_filename)
+    qc = load(circ_dir / circuit_filename)
     ops = get_ops_for_solver(qc, "z", 1)
     assert ops is not None
     assert len(ops) > 0

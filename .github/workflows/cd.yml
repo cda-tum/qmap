@@ -1,7 +1,5 @@
-name: CD
+name: CD 🚀
 on:
-  push:
-    branches: [main]
   release:
     types: [published]
   workflow_dispatch:
@@ -13,40 +11,16 @@ permissions:
 
 jobs:
   # Builds the sdist and wheels on all supported platforms and uploads the resulting
-  # wheels as GitHub artifacts `dev-cibw-*`, `test-cibw-*`, or `cibw-*`, depending on
-  # whether the workflow is triggered from a PR, a push to main, or a release, respectively.
+  # wheels as GitHub artifacts `dev-cibw-*` or `cibw-*`, depending on whether the
+  # workflow is triggered from a PR or a release, respectively.
   python-packaging:
     name: 🐍 Packaging
-    uses: cda-tum/mqt-workflows/.github/workflows/reusable-python-packaging.yml@v1.5
+    uses: cda-tum/mqt-workflows/.github/workflows/reusable-python-packaging.yml@v1.7
     with:
-      # Do not include local version information on pushes to main to facilitate TestPyPI uploads.
-      no-local-version: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
-      # Do not build emulated wheels on pushes to main to reduce runner load for CD.
-      build-emulated-wheels: ${{ github.ref != 'refs/heads/main' || github.event_name != 'push' }}
       # Make sure Z3 is available
       setup-z3: true
       # 4.13.0 has incorrectly tagged manylinux wheels
       z3-version: 4.12.6
-
-  # Downloads the previously generated artifacts and deploys to TestPyPI on pushes to main
-  deploy-test-pypi:
-    name: 🚀 Deploy to Test PyPI
-    runs-on: ubuntu-latest
-    environment:
-      name: test-pypi
-      url: https://test.pypi.org/p/mqt.qmap
-    needs: [python-packaging]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          pattern: test-cibw-*
-          path: dist
-          merge-multiple: true
-      - uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          repository-url: https://test.pypi.org/legacy/
-          attestations: true
 
   # Downloads the previously generated artifacts and deploys to PyPI on published releases.
   deploy:
@@ -68,5 +42,3 @@ jobs:
         with:
           subject-path: "dist/*"
       - uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          attestations: true

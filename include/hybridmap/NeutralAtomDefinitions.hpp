@@ -12,6 +12,11 @@
 #include <utility>
 #include <vector>
 
+namespace qc {
+// forward declaration
+class Operation;
+} // namespace qc
+
 namespace na {
 // A CoordIndex corresponds to node in the SLM grid, where an atom can be placed
 // (or not).

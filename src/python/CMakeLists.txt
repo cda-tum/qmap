@@ -3,9 +3,19 @@ if(APPLE)
 else()
   set(BASEPOINT $ORIGIN)
 endif()
-list(APPEND CMAKE_INSTALL_RPATH ${BASEPOINT} ${BASEPOINT}/${CMAKE_INSTALL_LIBDIR})
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+list(
+  APPEND
+  CMAKE_INSTALL_RPATH
+  ${BASEPOINT}
+  ${BASEPOINT}/${CMAKE_INSTALL_LIBDIR}
+  ${BASEPOINT}/../core/${CMAKE_INSTALL_LIBDIR}
+  ${BASEPOINT}/../core/lib
+  ${BASEPOINT}/../core/lib64
+  ${BASEPOINT}/../../core/${CMAKE_INSTALL_LIBDIR}
+  ${BASEPOINT}/../../core/lib
+  ${BASEPOINT}/../../core/lib64)
 
 pybind11_add_module(
   pyqmap
@@ -22,7 +32,6 @@ target_link_libraries(
           MQT::QMapSCHeuristic
           MQT::QMapCliffordSynthesis
           MQT::QMapHybrid
-          MQT::CorePython
           MQT::NASP
           MQT::ProjectOptions
           MQT::ProjectWarnings

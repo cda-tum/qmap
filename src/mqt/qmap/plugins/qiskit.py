@@ -12,6 +12,16 @@ if TYPE_CHECKING:
 
 from mqt.qmap import Architecture
 
+__all__ = [
+    "import_backend",
+    "import_backend_properties",
+    "import_target",
+]
+
+
+def __dir__() -> list[str]:
+    return __all__
+
 
 def import_backend(backend: Backend) -> Architecture:
     """Import a backend from qiskit.providers.Backend.

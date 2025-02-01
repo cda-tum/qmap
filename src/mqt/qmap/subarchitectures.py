@@ -26,6 +26,17 @@ import contextlib
 import rustworkx as rx
 import rustworkx.visualization as rxviz
 
+__all__ = [
+    "SubarchitectureOrder",
+    "ibm_guadalupe_subarchitectures",
+    "rigetti_16_subarchitectures",
+]
+
+
+def __dir__() -> list[str]:
+    return __all__
+
+
 with contextlib.suppress(TypeError):
     Graph: TypeAlias = rx.PyGraph[int, Optional[int]]
 

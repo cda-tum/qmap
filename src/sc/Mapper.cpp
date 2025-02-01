@@ -9,6 +9,7 @@
 #include "circuit_optimizer/CircuitOptimizer.hpp"
 #include "ir/operations/CompoundOperation.hpp"
 #include "ir/operations/OpType.hpp"
+#include "ir/operations/Operation.hpp"
 #include "sc/Architecture.hpp"
 #include "sc/configuration/Layering.hpp"
 #include "sc/utils.hpp"
@@ -41,7 +42,7 @@ Mapper::Mapper(qc::QuantumComputation quantumComputation, Architecture& arch)
   locations.resize(architecture->getNqubits(), DEFAULT_POSITION);
 
   // strip away qubits that are not used in the circuit
-  qc.stripIdleQubits(true, true);
+  qc.stripIdleQubits(true);
   // strip away final measurement gates
   qc::CircuitOptimizer::removeFinalMeasurements(qc);
 }

@@ -2,17 +2,25 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 
 from qiskit import QuantumCircuit, QuantumRegister, qasm3
 from qiskit.transpiler import Layout, TranspileLayout
 
 if TYPE_CHECKING:
+    from os import PathLike
+
     from qiskit.providers import Backend
     from qiskit.providers.models import BackendProperties
     from qiskit.transpiler.target import Target
 
+    from mqt.core.ir import QuantumComputation
+
     from .visualization import SearchVisualizer
+
+    CircuitInputType = Union[QuantumComputation, str, PathLike[str], QuantumCircuit]
+
+from mqt.core import load
 
 from .load_architecture import load_architecture
 from .load_calibration import load_calibration
@@ -32,6 +40,14 @@ from .pyqmap import (
     SwapReduction,
     map,  # noqa: A004
 )
+
+__all__ = [
+    "compile",
+]
+
+
+def __dir__() -> list[str]:
+    return __all__
 
 
 def extract_initial_layout_from_qasm(qasm: str, qregs: list[QuantumRegister]) -> Layout:
@@ -59,7 +75,7 @@ def extract_initial_layout_from_qasm(qasm: str, qregs: list[QuantumRegister]) ->
 
 
 def compile(  # noqa: A001
-    circ: QuantumCircuit | str,
+    circ: CircuitInputType,
     arch: str | Arch | Architecture | Backend | None,
     calibration: str | BackendProperties | Target | None = None,
     method: str | Method = "heuristic",
@@ -182,7 +198,8 @@ def compile(  # noqa: A001
         config.lookaheads = lookaheads
     config.lookahead_factor = lookahead_factor
 
-    results = map(circ, architecture, config)
+    qc = load(circ)
+    results = map(qc, architecture, config)
 
     circ = qasm3.loads(results.mapped_circuit)
     layout = extract_initial_layout_from_qasm(results.mapped_circuit, circ.qregs)

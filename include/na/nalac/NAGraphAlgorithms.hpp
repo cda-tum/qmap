@@ -76,7 +76,7 @@ public:
    * @param coloring a mapping from edges to colors
    * @param maxColor the maximum color used so far
    * @param e the edge to be colored
-   * @param v the root of the edge, i.e. the edpoint of the edge that is
+   * @param v the root of the edge, i.e. the endpoint of the edge that is
    * contained in the previously computed maximal independent set
    * @param sequence the sequence of vertices selected to be the moveable ones
    * @param partialOrder the partial order of the fixed vertices induced by the

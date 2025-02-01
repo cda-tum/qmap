@@ -227,13 +227,6 @@ def bell_circuit() -> QuantumCircuit:
     return circ
 
 
-def test_optimize_quantum_computation(bell_circuit: QuantumCircuit) -> None:
-    """Test that we can optimize an MQT QuantumComputation."""
-    qc = qmap.QuantumComputation.from_qiskit(bell_circuit)
-    circ, _ = qmap.optimize_clifford(circuit=qc)
-    assert qcec.verify(circ, bell_circuit).considered_equivalent()
-
-
 def test_optimize_from_qasm_file(bell_circuit: QuantumCircuit) -> None:
     """Test that we can optimize from a QASM file."""
     qasm2.dump(bell_circuit, Path("bell.qasm"))
